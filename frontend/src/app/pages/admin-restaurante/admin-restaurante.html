@@ -1,0 +1,927 @@
+<div class="admin-layout">
+
+  <aside class="sidebar">
+
+    <div class="brand">
+      <div class="brand-icon">🍽️</div>
+
+      <div>
+        <strong>Regional Express</strong>
+        <small>Administración restaurante</small>
+      </div>
+    </div>
+
+    <nav>
+
+      <button
+        type="button"
+        [class.activo]="seccion === 'inicio'"
+        (click)="cambiarSeccion('inicio')">
+        🏠 Inicio
+      </button>
+
+      <button
+        type="button"
+        [class.activo]="seccion === 'pedidos'"
+        (click)="cambiarSeccion('pedidos')">
+        📋 Pedidos
+      </button>
+
+      <button
+        type="button"
+        [class.activo]="seccion === 'productos'"
+        (click)="cambiarSeccion('productos')">
+        🍔 Productos
+      </button>
+
+      <button
+        type="button"
+        [class.activo]="seccion === 'categorias'"
+        (click)="cambiarSeccion('categorias')">
+        🗂️ Categorías
+      </button>
+
+      <button
+        type="button"
+        [class.activo]="seccion === 'historial'"
+        (click)="cambiarSeccion('historial')">
+        📚 Historial
+      </button>
+
+    </nav>
+
+    <div class="sidebar-user">
+
+      <strong>
+        {{ usuario?.nombre }}
+      </strong>
+
+      <small>
+        {{ usuario?.rol }}
+      </small>
+
+      <button
+        type="button"
+        class="logout"
+        (click)="cerrarSesion()">
+        Cerrar sesión
+      </button>
+
+    </div>
+
+  </aside>
+
+  <main class="contenido">
+
+    <header class="encabezado">
+
+      <div>
+        <span class="eyebrow">
+          REGIONAL EXPRESS
+        </span>
+
+        <h1>
+          Panel del restaurante
+        </h1>
+      </div>
+
+      <div class="usuario-card">
+
+        <div class="avatar">
+          {{ usuario?.nombre?.charAt(0) }}
+        </div>
+
+        <div>
+          <strong>
+            {{ usuario?.nombre }}
+          </strong>
+
+          <small>
+            {{ usuario?.correo }}
+          </small>
+        </div>
+
+      </div>
+
+    </header>
+
+    <div
+      *ngIf="error"
+      class="alert error">
+      {{ error }}
+    </div>
+
+    <div
+      *ngIf="mensaje"
+      class="alert success">
+      {{ mensaje }}
+    </div>
+
+    <div
+      *ngIf="cargando"
+      class="loading">
+      Cargando información...
+    </div>
+
+    <!-- =================================================== -->
+    <!-- INICIO -->
+    <!-- =================================================== -->
+
+    <section
+      *ngIf="!cargando && seccion === 'inicio'">
+
+      <div class="bienvenida">
+
+        <div class="welcome-icon">
+          👋
+        </div>
+
+        <div>
+          <h2>
+            Bienvenido, {{ usuario?.nombre }}
+          </h2>
+
+          <p>
+            Gestiona los pedidos y el menú de tu restaurante.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="cards-dashboard">
+
+        <div class="stat-card">
+          <span>📋</span>
+
+          <div>
+            <small>Pedidos</small>
+            <strong>
+              {{ dashboard?.totalPedidos ?? pedidos.length }}
+            </strong>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <span>🍔</span>
+
+          <div>
+            <small>Productos</small>
+            <strong>
+              {{ dashboard?.totalProductos ?? productos.length }}
+            </strong>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <span>🗂️</span>
+
+          <div>
+            <small>Categorías</small>
+            <strong>
+              {{ dashboard?.totalCategorias ?? categorias.length }}
+            </strong>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <span>📚</span>
+
+          <div>
+            <small>Movimientos</small>
+            <strong>
+              {{ historial.length }}
+            </strong>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="acciones-rapidas">
+
+        <button
+          type="button"
+          (click)="cambiarSeccion('pedidos')">
+          📋 Ver pedidos
+        </button>
+
+        <button
+          type="button"
+          (click)="cambiarSeccion('productos')">
+          🍔 Administrar productos
+        </button>
+
+        <button
+          type="button"
+          (click)="cambiarSeccion('categorias')">
+          🗂️ Administrar categorías
+        </button>
+
+      </div>
+
+    </section>
+
+    <!-- =================================================== -->
+    <!-- PEDIDOS -->
+    <!-- =================================================== -->
+
+    <section
+      *ngIf="!cargando && seccion === 'pedidos'">
+
+      <div class="section-title">
+
+        <div>
+          <span class="eyebrow">
+            OPERACIONES
+          </span>
+
+          <h2>Pedidos recibidos</h2>
+
+          <p>
+            Consulta los pedidos y actualiza su estado.
+          </p>
+        </div>
+
+      </div>
+
+      <div class="tabla-wrapper">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Modalidad</th>
+              <th>Total</th>
+              <th>Estado</th>
+              <th>Fecha</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <tr
+              *ngFor="let pedido of pedidos">
+
+              <td>
+                <strong>
+                  {{ pedido.codigoRastreo }}
+                </strong>
+              </td>
+
+              <td>
+                {{ pedido.modalidadEntrega }}
+              </td>
+
+              <td>
+                Q{{ pedido.total | number:'1.2-2' }}
+              </td>
+
+              <td>
+
+                <select
+                  [value]="pedido.idEstadoActual"
+                  (change)="cambiarEstadoPedido(pedido, $event)"
+                  [disabled]="guardando">
+
+                  <option
+                    *ngFor="let estado of pedido.estadosDisponibles"
+                    [value]="estado.idEstado">
+
+                    {{ estado.nombreEstado }}
+
+                  </option>
+
+                </select>
+
+                <span
+                  *ngIf="!pedido.estadosDisponibles?.length">
+                  {{ pedido.estado }}
+                </span>
+
+              </td>
+
+              <td>
+                {{ pedido.fechaPedido | date:'dd/MM/yyyy HH:mm' }}
+              </td>
+
+              <td>
+
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  (click)="verPedido(pedido)">
+                  Ver detalle
+                </button>
+
+              </td>
+
+            </tr>
+
+            <tr *ngIf="pedidos.length === 0">
+              <td colspan="6" class="empty">
+                No existen pedidos registrados.
+              </td>
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+    <!-- =================================================== -->
+    <!-- PRODUCTOS -->
+    <!-- =================================================== -->
+
+    <section
+      *ngIf="!cargando && seccion === 'productos'">
+
+      <div class="section-title">
+
+        <div>
+          <span class="eyebrow">
+            MENÚ
+          </span>
+
+          <h2>Productos</h2>
+
+          <p>
+            Administra los productos disponibles para tus clientes.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="btn-primary"
+          (click)="nuevoProducto()">
+          + Nuevo producto
+        </button>
+
+      </div>
+
+      <div
+        *ngIf="mostrarFormularioProducto"
+        class="form-card">
+
+        <h3>
+          {{ editandoProducto
+            ? 'Editar producto'
+            : 'Nuevo producto'
+          }}
+        </h3>
+
+        <div class="form-grid">
+
+          <label>
+            Categoría
+
+            <select
+              [(ngModel)]="productoForm.idCategoria">
+
+              <option
+                *ngFor="let categoria of categorias"
+                [value]="categoria.idCategoria">
+
+                {{ categoria.nombre }}
+
+              </option>
+
+            </select>
+          </label>
+
+          <label>
+            Nombre
+
+            <input
+              type="text"
+              [(ngModel)]="productoForm.nombre">
+          </label>
+
+          <label>
+            Precio
+
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              [(ngModel)]="productoForm.precio">
+          </label>
+
+          <label>
+            Imagen / URL
+
+            <input
+              type="text"
+              [(ngModel)]="productoForm.imagen">
+          </label>
+
+          <label class="full">
+            Descripción
+
+            <textarea
+              rows="3"
+              [(ngModel)]="productoForm.descripcion">
+            </textarea>
+          </label>
+
+        </div>
+
+        <div class="form-actions">
+
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="cancelarProducto()">
+            Cancelar
+          </button>
+
+          <button
+            type="button"
+            class="btn-primary"
+            [disabled]="guardando"
+            (click)="guardarProducto()">
+
+            {{ guardando
+              ? 'Guardando...'
+              : 'Guardar producto'
+            }}
+
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="productos-grid">
+
+        <article
+          class="producto-card"
+          *ngFor="let producto of productos">
+
+          <div class="producto-icon">
+            🍔
+          </div>
+
+          <div class="producto-info">
+
+            <small>
+              {{ producto.categoria }}
+            </small>
+
+            <h3>
+              {{ producto.nombre }}
+            </h3>
+
+            <p>
+              {{ producto.descripcion }}
+            </p>
+
+            <strong class="precio">
+              Q{{ producto.precio | number:'1.2-2' }}
+            </strong>
+
+          </div>
+
+          <div class="producto-estados">
+
+            <span
+              [class.ok]="producto.disponible"
+              [class.no]="!producto.disponible">
+
+              {{
+                producto.disponible
+                  ? 'Disponible'
+                  : 'No disponible'
+              }}
+
+            </span>
+
+            <span
+              [class.ok]="producto.activo"
+              [class.no]="!producto.activo">
+
+              {{
+                producto.activo
+                  ? 'Activo'
+                  : 'Inactivo'
+              }}
+
+            </span>
+
+          </div>
+
+          <div class="card-actions">
+
+            <button
+              type="button"
+              (click)="editarProducto(producto)">
+              Editar
+            </button>
+
+            <button
+              type="button"
+              (click)="cambiarDisponibilidadProducto(producto)">
+
+              {{
+                producto.disponible
+                  ? 'No disponible'
+                  : 'Disponible'
+              }}
+
+            </button>
+
+            <button
+              type="button"
+              (click)="cambiarEstadoProducto(producto)">
+
+              {{
+                producto.activo
+                  ? 'Desactivar'
+                  : 'Activar'
+              }}
+
+            </button>
+
+          </div>
+
+        </article>
+
+      </div>
+
+    </section>
+
+    <!-- =================================================== -->
+    <!-- CATEGORÍAS -->
+    <!-- =================================================== -->
+
+    <section
+      *ngIf="!cargando && seccion === 'categorias'">
+
+      <div class="section-title">
+
+        <div>
+          <span class="eyebrow">
+            MENÚ
+          </span>
+
+          <h2>Categorías</h2>
+
+          <p>
+            Organiza el menú del restaurante.
+          </p>
+        </div>
+
+        <button
+          type="button"
+          class="btn-primary"
+          (click)="nuevaCategoria()">
+          + Nueva categoría
+        </button>
+
+      </div>
+
+      <div
+        *ngIf="mostrarFormularioCategoria"
+        class="form-card">
+
+        <h3>
+          {{
+            editandoCategoria
+              ? 'Editar categoría'
+              : 'Nueva categoría'
+          }}
+        </h3>
+
+        <div class="form-grid">
+
+          <label>
+            Nombre
+
+            <input
+              type="text"
+              [(ngModel)]="categoriaForm.nombre">
+          </label>
+
+          <label class="full">
+            Descripción
+
+            <textarea
+              rows="3"
+              [(ngModel)]="categoriaForm.descripcion">
+            </textarea>
+          </label>
+
+        </div>
+
+        <div class="form-actions">
+
+          <button
+            type="button"
+            class="btn-secondary"
+            (click)="cancelarCategoria()">
+            Cancelar
+          </button>
+
+          <button
+            type="button"
+            class="btn-primary"
+            [disabled]="guardando"
+            (click)="guardarCategoria()">
+
+            {{
+              guardando
+                ? 'Guardando...'
+                : 'Guardar categoría'
+            }}
+
+          </button>
+
+        </div>
+
+      </div>
+
+      <div class="tabla-wrapper">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Descripción</th>
+              <th>Estado</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <tr
+              *ngFor="let categoria of categorias">
+
+              <td>
+                <strong>
+                  {{ categoria.nombre }}
+                </strong>
+              </td>
+
+              <td>
+                {{ categoria.descripcion }}
+              </td>
+
+              <td>
+
+                <span
+                  class="badge"
+                  [class.ok]="categoria.activo"
+                  [class.no]="!categoria.activo">
+
+                  {{
+                    categoria.activo
+                      ? 'Activa'
+                      : 'Inactiva'
+                  }}
+
+                </span>
+
+              </td>
+
+              <td>
+
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  (click)="editarCategoria(categoria)">
+                  Editar
+                </button>
+
+                <button
+                  type="button"
+                  class="btn-secondary"
+                  (click)="cambiarEstadoCategoria(categoria)">
+
+                  {{
+                    categoria.activo
+                      ? 'Desactivar'
+                      : 'Activar'
+                  }}
+
+                </button>
+
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+    <!-- =================================================== -->
+    <!-- HISTORIAL -->
+    <!-- =================================================== -->
+
+    <section
+      *ngIf="!cargando && seccion === 'historial'">
+
+      <div class="section-title">
+
+        <div>
+
+          <span class="eyebrow">
+            AUDITORÍA
+          </span>
+
+          <h2>Historial de pedidos</h2>
+
+          <p>
+            Consulta quién realizó cada cambio y cuándo.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="tabla-wrapper">
+
+        <table>
+
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Estado</th>
+              <th>Usuario</th>
+              <th>Fecha / Hora</th>
+              <th>Observación</th>
+            </tr>
+          </thead>
+
+          <tbody>
+
+            <tr
+              *ngFor="let item of historial">
+
+              <td>
+                <strong>
+                  {{ item.codigoRastreo }}
+                </strong>
+              </td>
+
+              <td>
+                {{ item.estado }}
+              </td>
+
+              <td>
+                {{ item.usuario }}
+              </td>
+
+              <td>
+                {{ item.fechaHora | date:'dd/MM/yyyy HH:mm' }}
+              </td>
+
+              <td>
+                {{ item.observacion || '-' }}
+              </td>
+
+            </tr>
+
+            <tr
+              *ngIf="historial.length === 0">
+
+              <td
+                colspan="5"
+                class="empty">
+
+                No existe historial registrado.
+
+              </td>
+
+            </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>
+
+<!-- ======================================================= -->
+<!-- MODAL DETALLE PEDIDO -->
+<!-- ======================================================= -->
+
+<div
+  class="modal-backdrop"
+  *ngIf="pedidoSeleccionado">
+
+  <div class="modal">
+
+    <div class="modal-header">
+
+      <div>
+        <span class="eyebrow">
+          PEDIDO
+        </span>
+
+        <h2>
+          {{ pedidoSeleccionado.codigoRastreo }}
+        </h2>
+      </div>
+
+      <button
+        type="button"
+        class="close"
+        (click)="cerrarDetallePedido()">
+        ×
+      </button>
+
+    </div>
+
+    <div class="detalle-grid">
+
+      <div>
+        <small>Cliente</small>
+        <strong>
+          {{ pedidoSeleccionado.cliente }}
+        </strong>
+      </div>
+
+      <div>
+        <small>Modalidad</small>
+        <strong>
+          {{ pedidoSeleccionado.modalidadEntrega }}
+        </strong>
+      </div>
+
+      <div>
+        <small>Dirección</small>
+        <strong>
+          {{ pedidoSeleccionado.direccionEntrega || 'Recoger en restaurante' }}
+        </strong>
+      </div>
+
+      <div>
+        <small>Total</small>
+        <strong>
+          Q{{ pedidoSeleccionado.total | number:'1.2-2' }}
+        </strong>
+      </div>
+
+    </div>
+
+    <h3>Productos</h3>
+
+    <div class="tabla-wrapper">
+
+      <table>
+
+        <thead>
+          <tr>
+            <th>Producto</th>
+            <th>Cantidad</th>
+            <th>Precio</th>
+            <th>Subtotal</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr
+            *ngFor="let detalle of pedidoSeleccionado.productos">
+
+            <td>
+              {{ detalle.nombre }}
+            </td>
+
+            <td>
+              {{ detalle.cantidad }}
+            </td>
+
+            <td>
+              Q{{ detalle.precioUnitario | number:'1.2-2' }}
+            </td>
+
+            <td>
+              Q{{ detalle.subtotal | number:'1.2-2' }}
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</div>

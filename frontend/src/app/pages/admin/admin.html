@@ -1,0 +1,1374 @@
+<div class="admin-page">
+
+  <!-- ===================================================== -->
+  <!-- SIDEBAR -->
+  <!-- ===================================================== -->
+
+  <aside class="sidebar">
+
+    <div class="brand">
+      <div class="brand-icon">🚚</div>
+
+      <div>
+        <strong>Regional Express</strong>
+        <span>Administración</span>
+      </div>
+    </div>
+
+    <nav class="admin-nav">
+
+      <button
+        type="button"
+        [class.active]="seccion === 'dashboard'"
+        (click)="cambiarSeccion('dashboard')">
+        📊 Dashboard
+      </button>
+
+      <button
+        type="button"
+        [class.active]="seccion === 'usuarios'"
+        (click)="cambiarSeccion('usuarios')">
+        👥 Usuarios
+      </button>
+
+      <button
+        type="button"
+        [class.active]="seccion === 'servicios'"
+        (click)="cambiarSeccion('servicios')">
+        📦 Servicios
+      </button>
+
+      <button
+        type="button"
+        [class.active]="seccion === 'restaurantes'"
+        (click)="cambiarSeccion('restaurantes')">
+        🍽️ Restaurantes
+      </button>
+
+      <button
+        type="button"
+        [class.active]="seccion === 'motoristas'"
+        (click)="cambiarSeccion('motoristas')">
+        🛵 Motoristas
+      </button>
+
+    </nav>
+
+    <div class="sidebar-user">
+
+      <div class="avatar">
+        {{ usuario?.nombre?.charAt(0) || 'A' }}
+      </div>
+
+      <div>
+        <strong>{{ usuario?.nombre }}</strong>
+        <span>{{ usuario?.rol }}</span>
+      </div>
+
+    </div>
+
+  </aside>
+
+  <!-- ===================================================== -->
+  <!-- CONTENIDO -->
+  <!-- ===================================================== -->
+
+  <main class="admin-content">
+
+    <header class="admin-header">
+
+      <div>
+
+        <span class="eyebrow">
+          REGIONAL EXPRESS
+        </span>
+
+        <h1>
+          {{
+            seccion === 'dashboard'
+              ? 'Panel administrativo'
+              : seccion === 'usuarios'
+                ? 'Administración de usuarios'
+                : seccion === 'servicios'
+                  ? 'Servicios y asignaciones'
+                  : seccion === 'restaurantes'
+                    ? 'Administración de restaurantes'
+                    : 'Administración de motoristas'
+          }}
+        </h1>
+
+      </div>
+
+      <div class="user-card">
+
+        <div class="avatar light">
+          {{ usuario?.nombre?.charAt(0) || 'A' }}
+        </div>
+
+        <div>
+          <strong>{{ usuario?.nombre }}</strong>
+          <span>{{ usuario?.correo }}</span>
+        </div>
+
+        <button
+          type="button"
+          class="logout-btn"
+          (click)="cerrarSesion()">
+          Salir
+        </button>
+
+      </div>
+
+    </header>
+
+    <!-- ===================================================== -->
+    <!-- MENSAJES -->
+    <!-- ===================================================== -->
+
+    <div
+      *ngIf="error"
+      class="alert error">
+      {{ error }}
+    </div>
+
+    <div
+      *ngIf="mensaje"
+      class="alert success">
+      {{ mensaje }}
+    </div>
+
+    <div
+      *ngIf="cargando"
+      class="loading">
+      Cargando información...
+    </div>
+
+    <!-- ===================================================== -->
+    <!-- DASHBOARD -->
+    <!-- ===================================================== -->
+
+    <section
+      *ngIf="
+        !cargando &&
+        seccion === 'dashboard'
+      ">
+
+      <div class="section-title">
+
+        <div>
+
+          <span class="eyebrow">
+            RESUMEN
+          </span>
+
+          <h2>
+            Estado general
+          </h2>
+
+          <p>
+            Información general de Regional Express.
+          </p>
+
+        </div>
+
+      </div>
+
+      <div class="stats-grid">
+
+        <article class="stat-card">
+
+          <div class="stat-icon">👥</div>
+
+          <span>Usuarios</span>
+
+          <strong>
+            {{
+              dashboard?.totalUsuarios
+              ?? usuarios.length
+            }}
+          </strong>
+
+        </article>
+
+        <article class="stat-card">
+
+          <div class="stat-icon">📦</div>
+
+          <span>Servicios</span>
+
+          <strong>
+            {{
+              dashboard?.totalServicios
+              ?? servicios.length
+            }}
+          </strong>
+
+        </article>
+
+        <article class="stat-card">
+
+          <div class="stat-icon">🍽️</div>
+
+          <span>Restaurantes</span>
+
+          <strong>
+            {{ restaurantes.length }}
+          </strong>
+
+        </article>
+
+        <article class="stat-card">
+
+          <div class="stat-icon">🛵</div>
+
+          <span>Motoristas</span>
+
+          <strong>
+            {{ motoristas.length }}
+          </strong>
+
+        </article>
+
+      </div>
+
+    </section>
+
+    <!-- ===================================================== -->
+    <!-- USUARIOS -->
+    <!-- ===================================================== -->
+
+    <section
+      *ngIf="
+        !cargando &&
+        seccion === 'usuarios'
+      ">
+
+      <div class="section-title">
+
+        <div>
+
+          <span class="eyebrow">
+            SEGURIDAD
+          </span>
+
+          <h2>Usuarios</h2>
+
+          <p>
+            Administra usuarios y roles del sistema.
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="primary-btn"
+          (click)="nuevoUsuario()">
+          + Nuevo usuario
+        </button>
+
+      </div>
+
+      <!-- FORMULARIO USUARIO -->
+
+      <div
+        *ngIf="mostrarFormularioUsuario"
+        class="form-card">
+
+        <h3>
+          {{
+            editandoUsuario
+              ? 'Editar usuario'
+              : 'Nuevo usuario'
+          }}
+        </h3>
+
+        <div class="form-grid">
+
+          <div class="field">
+
+            <label>Nombre</label>
+
+            <input
+              type="text"
+              [(ngModel)]="usuarioForm.nombre">
+
+          </div>
+
+          <div class="field">
+
+            <label>Correo</label>
+
+            <input
+              type="email"
+              [(ngModel)]="usuarioForm.correo">
+
+          </div>
+
+          <div class="field">
+
+            <label>Rol</label>
+
+            <select
+              [(ngModel)]="usuarioForm.idRol">
+
+              <option
+                *ngFor="let rol of roles"
+                [ngValue]="rol.idRol">
+
+                {{
+                  rol.nombreRol
+                  ?? rol.nombre
+                }}
+
+              </option>
+
+            </select>
+
+          </div>
+
+          <div class="field">
+
+            <label>
+              {{
+                editandoUsuario
+                  ? 'Nueva contraseña (opcional)'
+                  : 'Contraseña'
+              }}
+            </label>
+
+            <input
+              type="password"
+              [(ngModel)]="usuarioForm.password">
+
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+
+          <button
+            type="button"
+            class="secondary-btn"
+            (click)="cancelarUsuario()">
+            Cancelar
+          </button>
+
+          <button
+            type="button"
+            class="primary-btn"
+            [disabled]="guardando"
+            (click)="guardarUsuario()">
+
+            {{
+              guardando
+                ? 'Guardando...'
+                : 'Guardar'
+            }}
+
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- TABLA USUARIOS -->
+
+      <div class="table-card">
+
+        <div class="table-responsive">
+
+          <table>
+
+            <thead>
+
+              <tr>
+                <th>Nombre</th>
+                <th>Correo</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              <tr
+                *ngFor="let item of usuarios">
+
+                <td>
+                  <strong>
+                    {{ item.nombre }}
+                  </strong>
+                </td>
+
+                <td>
+                  {{ item.correo }}
+                </td>
+
+                <td>
+
+                  <span class="badge blue">
+                    {{
+                      item.rol
+                      ?? item.nombreRol
+                    }}
+                  </span>
+
+                </td>
+
+                <td>
+
+                  <span
+                    class="badge"
+                    [class.green]="item.activo"
+                    [class.red]="!item.activo">
+
+                    {{
+                      item.activo
+                        ? 'Activo'
+                        : 'Inactivo'
+                    }}
+
+                  </span>
+
+                </td>
+
+                <td class="actions">
+
+                  <button
+                    type="button"
+                    class="small-btn"
+                    (click)="editarUsuario(item)">
+                    Editar
+                  </button>
+
+                  <button
+                    type="button"
+                    class="small-btn"
+                    [class.danger]="item.activo"
+                    [class.success]="!item.activo"
+                    (click)="cambiarEstadoUsuario(item)">
+
+                    {{
+                      item.activo
+                        ? 'Desactivar'
+                        : 'Activar'
+                    }}
+
+                  </button>
+
+                </td>
+
+              </tr>
+
+              <tr *ngIf="usuarios.length === 0">
+
+                <td
+                  colspan="5"
+                  class="empty-cell">
+                  No hay usuarios registrados.
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ===================================================== -->
+    <!-- SERVICIOS + ASIGNACIÓN MOTORISTA -->
+    <!-- ===================================================== -->
+
+    <section
+      *ngIf="
+        !cargando &&
+        seccion === 'servicios'
+      ">
+
+      <div class="section-title">
+
+        <div>
+
+          <span class="eyebrow">
+            OPERACIONES
+          </span>
+
+          <h2>
+            Servicios y asignaciones
+          </h2>
+
+          <p>
+            Consulta los servicios y asigna motoristas
+            disponibles a Delivery y Envíos.
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="secondary-btn"
+          [disabled]="cargandoAsignaciones || asignandoServicio !== null"
+          (click)="cargarAsignaciones()">
+          Actualizar
+        </button>
+
+      </div>
+
+      <div class="asignacion-aviso" *ngIf="avisoAsignacion" [class.asignacion-error]="tipoAvisoAsignacion === 'error'" role="alert" aria-live="polite">
+        <span>{{ avisoAsignacion }}</span>
+        <button type="button" aria-label="Cerrar notificación" (click)="avisoAsignacion = ''">×</button>
+      </div>
+      <p *ngIf="cargandoAsignaciones" role="status">Actualizando servicios y disponibilidad…</p>
+      <!-- RESUMEN DE ASIGNACIÓN -->
+
+      <div class="stats-grid">
+
+        <article class="stat-card">
+
+          <div class="stat-icon">📦</div>
+
+          <span>Servicios</span>
+
+          <strong>
+            {{ servicios.length }}
+          </strong>
+
+        </article>
+
+        <article class="stat-card">
+
+          <div class="stat-icon">⏳</div>
+
+          <span>Sin motorista</span>
+
+          <strong>
+            {{ pendientesAsignables }}
+          </strong>
+
+        </article>
+
+        <article class="stat-card">
+
+          <div class="stat-icon">🛵</div>
+
+          <span>Motoristas disponibles</span>
+
+          <strong>
+            {{ motoristasDisponibles.length }}
+          </strong>
+
+        </article>
+
+      </div>
+
+      <!-- TABLA DE SERVICIOS -->
+
+      <div class="table-card">
+
+        <div class="table-responsive">
+
+          <table>
+
+            <thead>
+
+              <tr>
+                <th>Código</th>
+                <th>Tipo</th>
+                <th>Cliente</th>
+                <th>Estado</th>
+                <th>Total</th>
+                <th>Fecha</th>
+                <th>Motorista</th>
+                <th>Acción</th>
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              <tr
+                *ngFor="let servicio of servicios">
+
+                <td>
+
+                  <strong>
+                    {{ servicio.codigoRastreo }}
+                  </strong>
+
+                  <small
+                    class="table-subtitle"
+                    *ngIf="servicio.modalidad">
+
+                    {{ servicio.modalidad }}
+
+                  </small>
+
+                </td>
+
+                <td>
+
+                  <span
+                    class="badge"
+                    [class.orange]="servicio.tipoServicio === 'DELIVERY'"
+                    [class.blue]="servicio.tipoServicio === 'ENVIO'">
+
+                    {{ servicio.tipoServicio }}
+
+                  </span>
+
+                </td>
+
+                <td>
+                  {{
+                    servicio.cliente
+                    ?? servicio.nombreCliente
+                    ?? 'Sin cliente'
+                  }}
+                </td>
+
+                <td>
+                  {{
+                    servicio.estado
+                    ?? servicio.estadoActual
+                    ?? 'Sin estado'
+                  }}
+                </td>
+
+                <td>
+
+                  Q{{
+                    servicio.total
+                    | number:'1.2-2'
+                  }}
+
+                </td>
+
+                <td>
+
+                  {{
+                    servicio.fechaCreacion
+                    | date:'dd/MM/yyyy HH:mm'
+                  }}
+
+                </td>
+
+                <td>
+                  <span *ngIf="servicio.asignacion?.etiqueta" class="table-subtitle">{{ servicio.asignacion.etiqueta }}</span>
+                  <span *ngIf="servicio.asignacion?.asignado && !servicio.asignacion?.etiqueta" class="badge green">🛵 {{ servicio.asignacion.nombre }}</span>
+                  <div *ngIf="servicio.asignacion?.puedeAsignar">
+                    <select [(ngModel)]="motoristaSeleccionado[servicio.idServicio]"
+                      [attr.aria-label]="'Motorista para ' + servicio.codigoRastreo"
+                      [disabled]="cargandoAsignaciones || !asignacionesListas || asignandoServicio !== null || motoristasDisponibles.length === 0">
+                      <option [ngValue]="0">Seleccionar motorista</option>
+                      <option *ngFor="let motorista of motoristasDisponibles" [ngValue]="motorista.idMotorista">{{ motorista.nombre }} — {{ motorista.numeroLicencia || 'Sin licencia' }}</option>
+                    </select>
+                    <small class="table-subtitle" *ngIf="motoristasDisponibles.length === 0">No hay motoristas disponibles.</small>
+                  </div>
+                </td>
+                <td class="actions">
+                  <a *ngIf="servicio.asignacion?.asignado && !servicio.asignacion?.etiqueta" class="small-btn map-link" routerLink="/rastreo" [queryParams]="{codigo: servicio.codigoRastreo}">Ver mapa</a>
+                  <button *ngIf="servicio.asignacion?.puedeAsignar" type="button" class="small-btn success"
+                    [disabled]="!asignacionesListas || cargandoAsignaciones || asignandoServicio !== null || !motoristaSeleccionado[servicio.idServicio]"
+                    (click)="asignarMotorista(servicio)">{{ asignandoServicio === servicio.idServicio ? 'Asignando...' : 'Asignar' }}</button>
+                  <button *ngIf="servicio.asignacion?.puedeQuitar" type="button" class="small-btn danger"
+                    [disabled]="!asignacionesListas || cargandoAsignaciones || asignandoServicio !== null"
+                    (click)="quitarAsignacion(servicio)">{{ asignandoServicio === servicio.idServicio ? 'Procesando...' : 'Quitar' }}</button>
+                </td>
+
+              </tr>
+
+              <tr
+                *ngIf="servicios.length === 0">
+
+                <td
+                  colspan="8"
+                  class="empty-cell">
+
+                  No hay servicios registrados.
+
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ===================================================== -->
+    <!-- RESTAURANTES -->
+    <!-- ===================================================== -->
+
+    <section
+      *ngIf="
+        !cargando &&
+        seccion === 'restaurantes'
+      ">
+
+      <div class="section-title">
+
+        <div>
+
+          <span class="eyebrow">
+            DELIVERY
+          </span>
+
+          <h2>
+            Restaurantes
+          </h2>
+
+          <p>
+            Crea y administra los restaurantes
+            de Regional Express.
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="primary-btn"
+          (click)="nuevoRestaurante()">
+          + Nuevo restaurante
+        </button>
+
+      </div>
+
+      <!-- FORMULARIO -->
+
+      <div
+        *ngIf="mostrarFormularioRestaurante"
+        class="form-card">
+
+        <h3>
+          {{
+            editandoRestaurante
+              ? 'Editar restaurante'
+              : 'Nuevo restaurante'
+          }}
+        </h3>
+
+        <div class="form-grid">
+
+          <div class="field">
+
+            <label>Nombre *</label>
+
+            <input
+              type="text"
+              [(ngModel)]="restauranteForm.nombre">
+
+          </div>
+
+          <div class="field">
+
+            <label>Dirección *</label>
+
+            <input
+              type="text"
+              [(ngModel)]="restauranteForm.direccion">
+
+          </div>
+
+          <div class="field">
+
+            <label>Teléfono</label>
+
+            <input
+              type="text"
+              [(ngModel)]="restauranteForm.telefono">
+
+          </div>
+
+          <div class="field">
+
+            <label>Correo</label>
+
+            <input
+              type="email"
+              [(ngModel)]="restauranteForm.correo">
+
+          </div>
+
+          <div class="field">
+
+            <label>
+              Horario de apertura
+            </label>
+
+            <input
+              type="time"
+              [(ngModel)]="restauranteForm.horarioApertura">
+
+          </div>
+
+          <div class="field">
+
+            <label>
+              Horario de cierre
+            </label>
+
+            <input
+              type="time"
+              [(ngModel)]="restauranteForm.horarioCierre">
+
+          </div>
+
+          <div class="field">
+
+            <label>Latitud</label>
+
+            <input
+              type="number"
+              step="any"
+              [(ngModel)]="restauranteForm.latitud">
+
+          </div>
+
+          <div class="field">
+
+            <label>Longitud</label>
+
+            <input
+              type="number"
+              step="any"
+              [(ngModel)]="restauranteForm.longitud">
+
+          </div>
+
+          <div class="field full">
+
+            <label>Imagen / URL</label>
+
+            <input
+              type="text"
+              [(ngModel)]="restauranteForm.imagen">
+
+          </div>
+
+          <div class="field full">
+
+            <label>Descripción</label>
+
+            <textarea
+              rows="3"
+              [(ngModel)]="restauranteForm.descripcion">
+            </textarea>
+
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+
+          <button
+            type="button"
+            class="secondary-btn"
+            (click)="cancelarRestaurante()">
+            Cancelar
+          </button>
+
+          <button
+            type="button"
+            class="primary-btn"
+            [disabled]="guardando"
+            (click)="guardarRestaurante()">
+
+            {{
+              guardando
+                ? 'Guardando...'
+                : 'Guardar restaurante'
+            }}
+
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- TABLA -->
+
+      <div class="table-card">
+
+        <div class="table-responsive">
+
+          <table>
+
+            <thead>
+
+              <tr>
+                <th>Restaurante</th>
+                <th>Dirección</th>
+                <th>Contacto</th>
+                <th>Horario</th>
+                <th>Productos</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              <tr
+                *ngFor="
+                  let restaurante
+                  of restaurantes
+                ">
+
+                <td>
+
+                  <strong>
+                    {{ restaurante.nombre }}
+                  </strong>
+
+                  <small class="table-subtitle">
+                    {{ restaurante.descripcion }}
+                  </small>
+
+                </td>
+
+                <td>
+                  {{ restaurante.direccion }}
+                </td>
+
+                <td>
+
+                  <div>
+                    {{
+                      restaurante.telefono
+                      || 'Sin teléfono'
+                    }}
+                  </div>
+
+                  <small>
+                    {{
+                      restaurante.correo
+                      || 'Sin correo'
+                    }}
+                  </small>
+
+                </td>
+
+                <td>
+
+                  {{
+                    restaurante.horarioApertura
+                      ? (
+                          restaurante.horarioApertura
+                          | slice:0:5
+                        )
+                      : '--:--'
+                  }}
+
+                  -
+
+                  {{
+                    restaurante.horarioCierre
+                      ? (
+                          restaurante.horarioCierre
+                          | slice:0:5
+                        )
+                      : '--:--'
+                  }}
+
+                </td>
+
+                <td>
+
+                  <span class="badge blue">
+
+                    {{
+                      restaurante.cantidadProductos
+                      ?? 0
+                    }}
+
+                  </span>
+
+                </td>
+
+                <td>
+
+                  <span
+                    class="badge"
+                    [class.green]="restaurante.activo"
+                    [class.red]="!restaurante.activo">
+
+                    {{
+                      restaurante.activo
+                        ? 'Activo'
+                        : 'Inactivo'
+                    }}
+
+                  </span>
+
+                </td>
+
+                <td class="actions">
+
+                  <button
+                    type="button"
+                    class="small-btn"
+                    (click)="editarRestaurante(restaurante)">
+                    Editar
+                  </button>
+
+                  <button
+                    type="button"
+                    class="small-btn"
+                    [class.danger]="restaurante.activo"
+                    [class.success]="!restaurante.activo"
+                    (click)="cambiarEstadoRestaurante(restaurante)">
+
+                    {{
+                      restaurante.activo
+                        ? 'Desactivar'
+                        : 'Activar'
+                    }}
+
+                  </button>
+
+                </td>
+
+              </tr>
+
+              <tr
+                *ngIf="restaurantes.length === 0">
+
+                <td
+                  colspan="7"
+                  class="empty-cell">
+                  No hay restaurantes registrados.
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ===================================================== -->
+    <!-- MOTORISTAS -->
+    <!-- ===================================================== -->
+
+    <section
+      *ngIf="
+        !cargando &&
+        seccion === 'motoristas'
+      ">
+
+      <div class="section-title">
+
+        <div>
+
+          <span class="eyebrow">
+            LOGÍSTICA
+          </span>
+
+          <h2>
+            Motoristas
+          </h2>
+
+          <p>
+            Administra los motoristas encargados
+            de las entregas.
+          </p>
+
+        </div>
+
+        <button
+          type="button"
+          class="primary-btn"
+          (click)="nuevoMotorista()">
+          + Registrar motorista
+        </button>
+
+      </div>
+
+      <!-- FORMULARIO MOTORISTA -->
+
+      <div
+        *ngIf="mostrarFormularioMotorista"
+        class="form-card">
+
+        <h3>
+          {{
+            editandoMotorista
+              ? 'Editar motorista'
+              : 'Registrar motorista'
+          }}
+        </h3>
+
+        <div class="form-grid">
+
+          <div
+            class="field"
+            *ngIf="!editandoMotorista">
+
+            <label>
+              Usuario MOTORISTA *
+            </label>
+
+            <select
+              [(ngModel)]="motoristaForm.idUsuario">
+
+              <option [ngValue]="0">
+                Seleccione un usuario
+              </option>
+
+              <option
+                *ngFor="
+                  let item
+                  of usuariosMotoristasDisponibles
+                "
+                [ngValue]="item.idUsuario">
+
+                {{ item.nombre }}
+                -
+                {{ item.correo }}
+
+              </option>
+
+            </select>
+
+            <small
+              *ngIf="
+                usuariosMotoristasDisponibles.length === 0
+              ">
+
+              Primero crea un usuario con rol
+              MOTORISTA desde Usuarios.
+
+            </small>
+
+          </div>
+
+          <div class="field">
+
+            <label>
+              Número de licencia
+            </label>
+
+            <input
+              type="text"
+              [(ngModel)]="motoristaForm.numeroLicencia">
+
+          </div>
+
+          <div class="field checkbox-field">
+
+            <label>
+
+              <input
+                type="checkbox"
+                [(ngModel)]="motoristaForm.disponible">
+
+              Disponible para servicios
+
+            </label>
+
+          </div>
+
+        </div>
+
+        <div class="form-actions">
+
+          <button
+            type="button"
+            class="secondary-btn"
+            (click)="cancelarMotorista()">
+            Cancelar
+          </button>
+
+          <button
+            type="button"
+            class="primary-btn"
+            [disabled]="guardando"
+            (click)="guardarMotorista()">
+
+            {{
+              guardando
+                ? 'Guardando...'
+                : 'Guardar motorista'
+            }}
+
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- TABLA MOTORISTAS -->
+
+      <div class="table-card">
+
+        <div class="table-responsive">
+
+          <table>
+
+            <thead>
+
+              <tr>
+                <th>Motorista</th>
+                <th>Correo</th>
+                <th>Licencia</th>
+                <th>Disponibilidad</th>
+                <th>Servicios</th>
+                <th>Vehículos</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+              </tr>
+
+            </thead>
+
+            <tbody>
+
+              <tr
+                *ngFor="
+                  let motorista
+                  of motoristas
+                ">
+
+                <td>
+
+                  <strong>
+                    {{ motorista.nombre }}
+                  </strong>
+
+                </td>
+
+                <td>
+                  {{ motorista.correo }}
+                </td>
+
+                <td>
+
+                  {{
+                    motorista.numeroLicencia
+                    || 'Sin licencia'
+                  }}
+
+                </td>
+
+                <td>
+
+                  <button
+                    type="button"
+                    class="status-button"
+                    [class.available]="motorista.disponible"
+                    [class.unavailable]="!motorista.disponible"
+                    [disabled]="!motorista.activo"
+                    (click)="cambiarDisponibilidadMotorista(motorista)">
+
+                    {{
+                      motorista.disponible
+                        ? 'Disponible'
+                        : 'No disponible'
+                    }}
+
+                  </button>
+
+                </td>
+
+                <td>
+                  {{
+                    motorista.cantidadServicios
+                    ?? 0
+                  }}
+                </td>
+
+                <td>
+                  {{
+                    motorista.cantidadVehiculos
+                    ?? 0
+                  }}
+                </td>
+
+                <td>
+
+                  <span
+                    class="badge"
+                    [class.green]="motorista.activo"
+                    [class.red]="!motorista.activo">
+
+                    {{
+                      motorista.activo
+                        ? 'Activo'
+                        : 'Inactivo'
+                    }}
+
+                  </span>
+
+                </td>
+
+                <td class="actions">
+
+                  <button
+                    type="button"
+                    class="small-btn"
+                    (click)="editarMotorista(motorista)">
+                    Editar
+                  </button>
+
+                  <button
+                    type="button"
+                    class="small-btn"
+                    [class.danger]="motorista.activo"
+                    [class.success]="!motorista.activo"
+                    (click)="cambiarEstadoMotorista(motorista)">
+
+                    {{
+                      motorista.activo
+                        ? 'Desactivar'
+                        : 'Activar'
+                    }}
+
+                  </button>
+
+                </td>
+
+              </tr>
+
+              <tr
+                *ngIf="motoristas.length === 0">
+
+                <td
+                  colspan="8"
+                  class="empty-cell">
+
+                  No hay motoristas registrados.
+
+                </td>
+
+              </tr>
+
+            </tbody>
+
+          </table>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+</div>

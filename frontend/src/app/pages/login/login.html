@@ -1,0 +1,179 @@
+<section
+  class="login-page notranslate"
+  translate="no">
+
+  <a
+    routerLink="/"
+    class="back-link">
+
+    ← Volver al inicio
+
+  </a>
+
+
+  <div class="login-container">
+
+    <div class="brand-panel">
+
+      <div class="brand-content">
+
+        <span class="brand-small">
+          REGIONAL EXPRESS
+        </span>
+
+        <h1>
+          Todo tu servicio,
+          en un solo lugar.
+        </h1>
+
+        <p>
+          Gestiona pedidos, envíos y
+          entregas desde nuestra plataforma.
+        </p>
+
+
+        <div class="features">
+
+          <div>
+            🍔
+            <span>Delivery</span>
+          </div>
+
+          <div>
+            📦
+            <span>Envíos</span>
+          </div>
+
+          <div>
+            📍
+            <span>Rastreo</span>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="form-panel">
+
+      <div class="login-card">
+
+        <div class="logo">
+          🚚
+        </div>
+
+        <span class="small-title">
+          REGIONAL EXPRESS
+        </span>
+
+        <h2>
+          Iniciar sesión
+        </h2>
+
+        <p class="subtitle">
+          Ingresa tus credenciales para continuar.
+        </p>
+
+
+        <form
+          (ngSubmit)="iniciarSesion()">
+
+          <div class="field">
+
+            <label>
+              Correo electrónico
+            </label>
+
+            <input
+              type="email"
+              name="correo"
+              [(ngModel)]="correo"
+              autocomplete="email"
+              placeholder="correo@ejemplo.com">
+
+          </div>
+
+
+          <div class="field">
+
+            <label>
+              Contraseña
+            </label>
+
+            <div class="password-field">
+
+              <input
+                [type]="
+                  mostrarPassword
+                  ? 'text'
+                  : 'password'
+                "
+                name="password"
+                [(ngModel)]="password"
+                autocomplete="current-password"
+                placeholder="Tu contraseña">
+
+              <button
+                type="button"
+                class="show-password"
+                (click)="alternarPassword()">
+
+                {{
+                  mostrarPassword
+                  ? 'Ocultar'
+                  : 'Ver'
+                }}
+
+              </button>
+
+            </div>
+
+          </div>
+
+
+          <div
+            *ngIf="error"
+            class="error-message">
+
+            {{ error }}
+
+          </div>
+
+
+          <button
+            type="submit"
+            class="login-button"
+            [disabled]="cargando">
+
+            {{
+              cargando
+              ? 'Ingresando...'
+              : 'Iniciar sesión'
+            }}
+
+          </button>
+
+        </form>
+
+
+        <div class="login-footer">
+
+          <span>
+            ¿Solo quieres consultar un servicio?
+          </span>
+
+          <a routerLink="/rastreo">
+            Rastrear código
+          </a>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>

@@ -1,0 +1,798 @@
+<section
+  class="restaurant-page notranslate"
+  translate="no">
+
+  <div class="container py-4">
+
+    <!-- ====================================== -->
+    <!-- CARGANDO -->
+    <!-- ====================================== -->
+
+    <div
+      *ngIf="cargando"
+      class="loading">
+
+      <div class="spinner-border text-warning"></div>
+
+      <p>
+        Cargando restaurante...
+      </p>
+
+    </div>
+
+
+    <!-- ====================================== -->
+    <!-- ERROR GENERAL -->
+    <!-- ====================================== -->
+
+    <div
+      *ngIf="error"
+      class="alert alert-danger">
+
+      {{ error }}
+
+    </div>
+
+
+    <!-- ====================================== -->
+    <!-- CONTENIDO -->
+    <!-- ====================================== -->
+
+    <div
+      *ngIf="
+        !cargando &&
+        restaurante
+      ">
+
+      <a
+        routerLink="/delivery"
+        class="back-link">
+
+        ← Volver a restaurantes
+
+      </a>
+
+
+      <!-- ====================================== -->
+      <!-- ENCABEZADO RESTAURANTE -->
+      <!-- ====================================== -->
+
+      <section class="restaurant-hero">
+
+        <div>
+
+          <div class="restaurant-badges">
+
+            <span class="badge-open">
+              Menú disponible
+            </span>
+
+            <span class="badge-delivery">
+              🛵 Delivery
+            </span>
+
+          </div>
+
+
+          <h1>
+            {{ restaurante.nombre }}
+          </h1>
+
+
+          <p>
+            {{ restaurante.descripcion }}
+          </p>
+
+
+          <div class="restaurant-meta">
+
+            <span>
+              📍 {{ restaurante.direccion }}
+            </span>
+
+            <span>
+              Delivery o recoger
+            </span>
+
+            <span>
+              Pedidos en línea
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="restaurant-logo">
+          🍽️
+        </div>
+
+      </section>
+
+
+      <!-- ====================================== -->
+      <!-- CUERPO -->
+      <!-- ====================================== -->
+
+      <div class="layout">
+
+
+        <!-- ====================================== -->
+        <!-- MENÚ -->
+        <!-- ====================================== -->
+
+        <main class="menu-section">
+
+          <div class="menu-title">
+
+            <div>
+
+              <span class="small-title">
+                MENÚ
+              </span>
+
+              <h2>
+                ¿Qué quieres pedir?
+              </h2>
+
+            </div>
+
+
+            <span class="product-count">
+
+              {{ productos.length }}
+              productos
+
+            </span>
+
+          </div>
+
+
+          <!-- ====================================== -->
+          <!-- PRODUCTOS -->
+          <!-- ====================================== -->
+
+          <div class="product-grid">
+
+            <article
+              *ngFor="let producto of productos"
+              class="product-card">
+
+              <div class="product-image">
+
+                <img
+                  *ngIf="producto.imagen"
+                  [src]="producto.imagen"
+                  [alt]="producto.nombre + ' — ' + producto.descripcion" loading="lazy" decoding="async" (error)="producto.imagen = null">
+
+
+                <div
+                  *ngIf="!producto.imagen"
+                  class="placeholder">
+
+                  🍔
+
+                </div>
+
+
+                <div
+                  *ngIf="
+                    cantidadProducto(
+                      producto.idProducto
+                    ) > 0
+                  "
+                  class="quantity-badge">
+
+                  {{
+                    cantidadProducto(
+                      producto.idProducto
+                    )
+                  }}
+
+                </div>
+
+              </div>
+
+
+              <div class="product-content">
+                <small *ngIf="producto.imagenReferencial && producto.imagen" class="image-note">Imagen de referencia</small>
+
+                <h3>
+                  {{ producto.nombre }}
+                </h3>
+
+
+                <p>
+                  {{ producto.descripcion }}
+                </p>
+
+
+                <div class="product-bottom">
+
+                  <strong class="price">
+
+                    Q{{
+                      producto.precio
+                      | number:'1.2-2'
+                    }}
+
+                  </strong>
+
+
+                  <button
+                    type="button"
+                    class="btn-add"
+                    [disabled]="producto.disponible === false" (click)="agregar(producto)">
+
+                    + Agregar
+
+                  </button>
+
+                </div>
+
+              </div>
+
+            </article>
+
+          </div>
+
+        </main>
+
+
+        <!-- ====================================== -->
+        <!-- CARRITO -->
+        <!-- ====================================== -->
+
+        <aside class="cart">
+
+          <div class="cart-header">
+
+            <div>
+
+              <span class="small-title">
+                TU PEDIDO
+              </span>
+
+              <h3>
+                🛒 Carrito
+              </h3>
+
+            </div>
+
+
+            <span class="cart-counter">
+
+              {{
+                carrito.obtenerCantidadTotal()
+              }}
+
+            </span>
+
+          </div>
+
+
+          <!-- ====================================== -->
+          <!-- CARRITO VACÍO -->
+          <!-- ====================================== -->
+
+          <div
+            *ngIf="
+              itemsCarrito.length === 0 &&
+              !pedidoConfirmado
+            "
+            class="empty-cart">
+
+            <div class="empty-icon">
+              🛍️
+            </div>
+
+            <strong>
+              Tu carrito está vacío
+            </strong>
+
+            <p>
+              Agrega productos del menú.
+            </p>
+
+          </div>
+
+
+          <!-- ====================================== -->
+          <!-- PEDIDO CONFIRMADO -->
+          <!-- ====================================== -->
+
+          <div
+            *ngIf="pedidoConfirmado"
+            class="alert alert-success mt-3">
+
+            <div class="text-center">
+
+              <div style="font-size: 45px;">
+                ✅
+              </div>
+
+              <h4 class="fw-bold mt-2">
+                ¡Pedido confirmado!
+              </h4>
+
+              <p>
+                Tu pedido fue registrado
+                correctamente.
+              </p>
+
+
+              <hr>
+
+
+              <p class="mb-1">
+                Tu código de rastreo es:
+              </p>
+
+
+              <h3 class="fw-bold">
+
+                {{ codigoRastreo }}
+
+              </h3>
+
+
+              <p role="status">Correo de confirmación: {{ correoConfirmacion }}</p>
+<p class="mb-3">
+                Guarda este código para consultar
+                el estado de tu pedido.
+              </p>
+
+
+              <a
+                routerLink="/rastreo"
+                class="btn btn-success w-100">
+
+                🔎 Rastrear mi pedido
+
+              </a>
+
+            </div>
+
+          </div>
+
+
+          <!-- ====================================== -->
+          <!-- CARRITO CON PRODUCTOS -->
+          <!-- ====================================== -->
+
+          <div
+            *ngIf="
+              itemsCarrito.length > 0 &&
+              !pedidoConfirmado
+            ">
+
+
+            <!-- ====================================== -->
+            <!-- ITEMS -->
+            <!-- ====================================== -->
+
+            <div
+              *ngFor="let item of itemsCarrito"
+              class="cart-item">
+
+              <div class="cart-item-main">
+
+                <strong>
+                  {{ item.nombre }}
+                </strong>
+
+                <small>
+
+                  Q{{
+                    item.precio
+                    | number:'1.2-2'
+                  }}
+                  c/u
+
+                </small>
+
+              </div>
+
+
+              <div class="cart-item-bottom">
+
+                <div class="quantity-control">
+
+                  <button
+                    type="button"
+                    (click)="
+                      disminuir(
+                        item.idProducto
+                      )
+                    ">
+
+                    −
+
+                  </button>
+
+
+                  <span>
+                    {{ item.cantidad }}
+                  </span>
+
+
+                  <button
+                    type="button"
+                    (click)="
+                      aumentar(
+                        item.idProducto
+                      )
+                    ">
+
+                    +
+
+                  </button>
+
+                </div>
+
+
+                <strong>
+
+                  Q{{
+                    subtotalItem(item)
+                    | number:'1.2-2'
+                  }}
+
+                </strong>
+
+
+                <button
+                  type="button"
+                  class="remove"
+                  (click)="
+                    eliminar(
+                      item.idProducto
+                    )
+                  ">
+
+                  🗑
+
+                </button>
+
+              </div>
+
+            </div>
+
+
+            <!-- ====================================== -->
+            <!-- MODALIDAD -->
+            <!-- ====================================== -->
+
+            <div class="delivery-mode">
+
+              <span class="small-title">
+                ¿CÓMO LO QUIERES?
+              </span>
+
+
+              <div class="mode-grid">
+
+
+                <!-- DOMICILIO -->
+
+                <button
+                  type="button"
+                  class="
+                    mode-card
+                    notranslate
+                  "
+                  translate="no"
+
+                  [class.active]="
+                    modalidadEntrega ===
+                    'DOMICILIO'
+                  "
+
+                  (click)="
+                    cambiarModalidad(
+                      'DOMICILIO'
+                    )
+                  ">
+
+                  <span class="mode-icon">
+                    🛵
+                  </span>
+
+                  <strong>
+                    Entrega a domicilio
+                  </strong>
+
+                  <small>
+                    Nosotros te lo llevamos
+                  </small>
+
+                </button>
+
+
+                <!-- RECOGER -->
+
+                <button
+                  type="button"
+                  class="
+                    mode-card
+                    notranslate
+                  "
+                  translate="no"
+
+                  [class.active]="
+                    modalidadEntrega ===
+                    'RECOGER'
+                  "
+
+                  (click)="
+                    cambiarModalidad(
+                      'RECOGER'
+                    )
+                  ">
+
+                  <span class="mode-icon">
+                    🏪
+                  </span>
+
+                  <strong>
+                    Pasar a recoger
+                  </strong>
+
+                  <small>
+                    Recógelo en el restaurante
+                  </small>
+
+                </button>
+
+              </div>
+
+            </div>
+
+
+            <!-- ====================================== -->
+            <!-- DATOS DOMICILIO -->
+            <!-- ====================================== -->
+
+            <div
+              *ngIf="
+                modalidadEntrega ===
+                'DOMICILIO'
+              "
+              class="address-box">
+
+              <label>
+                Dirección de entrega
+              </label>
+
+
+              <input
+                [(ngModel)]="direccion"
+                type="text"
+                placeholder="
+                  Ej. San Raymundo,
+                  Guatemala
+                ">
+
+
+              <label>
+                Referencia
+              </label>
+
+
+              <textarea
+                [(ngModel)]="referencia"
+                rows="2"
+                placeholder="
+                  Color de casa,
+                  portón o referencia
+                ">
+              </textarea>
+
+            </div>
+
+
+            <!-- ====================================== -->
+            <!-- RECOGER -->
+            <!-- ====================================== -->
+
+            <div
+              *ngIf="
+                modalidadEntrega ===
+                'RECOGER'
+              "
+              class="
+                alert
+                alert-warning
+                mt-3
+              ">
+
+              <strong>
+                🏪 Pasar a recoger
+              </strong>
+
+              <div>
+                No se cobrará costo de envío.
+              </div>
+
+            </div>
+
+
+            <!-- ====================================== -->
+            <!-- OBSERVACIONES -->
+            <!-- ====================================== -->
+
+            <div class="address-box mt-3">
+
+              <label>
+                Observaciones del pedido
+              </label>
+
+
+              <textarea
+                [(ngModel)]="observaciones"
+                rows="2"
+                placeholder="
+                  Ej. Sin cebolla,
+                  tocar el timbre,
+                  llamar al llegar...
+                ">
+              </textarea>
+
+            </div>
+
+
+            <!-- ====================================== -->
+            <!-- TOTALES -->
+            <!-- ====================================== -->
+
+            <div class="summary">
+
+              <div>
+
+                <span>
+                  Productos
+                </span>
+
+                <strong>
+
+                  Q{{
+                    subtotal()
+                    | number:'1.2-2'
+                  }}
+
+                </strong>
+
+              </div>
+
+
+              <div>
+
+                <span>
+                  Envío
+                </span>
+
+
+                <strong
+                  *ngIf="
+                    modalidadEntrega ===
+                    'DOMICILIO'
+                  ">
+
+                  Q{{
+                    delivery()
+                    | number:'1.2-2'
+                  }}
+
+                </strong>
+
+
+                <strong
+                  *ngIf="
+                    modalidadEntrega ===
+                    'RECOGER'
+                  "
+                  class="text-success">
+
+                  Gratis
+
+                </strong>
+
+              </div>
+
+
+              <hr>
+
+
+              <div class="total-row">
+
+                <span>
+                  Total
+                </span>
+
+                <strong>
+
+                  Q{{
+                    total()
+                    | number:'1.2-2'
+                  }}
+
+                </strong>
+
+              </div>
+
+            </div>
+
+
+            <!-- ====================================== -->
+            <!-- MENSAJE DE ERROR -->
+            <!-- ====================================== -->
+
+            <div
+              *ngIf="
+                mensajePedido &&
+                !pedidoConfirmado
+              "
+              class="
+                alert
+                alert-danger
+                mt-3
+              ">
+
+              {{ mensajePedido }}
+
+            </div>
+
+
+            <!-- ====================================== -->
+            <!-- CONFIRMAR -->
+            <!-- ====================================== -->
+
+            <button
+              type="button"
+              class="checkout-btn"
+              [disabled]="procesandoPedido"
+              (click)="confirmarPedido()">
+
+
+              <span
+                *ngIf="
+                  !procesandoPedido
+                ">
+
+                Confirmar pedido
+
+              </span>
+
+
+              <span
+                *ngIf="
+                  procesandoPedido
+                ">
+
+                Procesando...
+
+              </span>
+
+
+              <span>
+
+                Q{{
+                  total()
+                  | number:'1.2-2'
+                }}
+
+              </span>
+
+            </button>
+
+          </div>
+
+        </aside>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>

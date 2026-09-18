@@ -1,0 +1,6 @@
+@RegionalExpress.API_HostAddress = http://localhost:5192
+
+GET {{RegionalExpress.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

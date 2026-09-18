@@ -1,0 +1,827 @@
+<section
+  class="tracking-page notranslate"
+  translate="no">
+
+  <div class="container py-5">
+
+
+    <!-- ====================================== -->
+    <!-- VOLVER -->
+    <!-- ====================================== -->
+
+    <a
+      routerLink="/"
+      class="back-link">
+
+      ← Volver al inicio
+
+    </a>
+
+
+    <!-- ====================================== -->
+    <!-- ENCABEZADO -->
+    <!-- ====================================== -->
+
+    <div class="tracking-header">
+
+      <div class="tracking-icon">
+        📍
+      </div>
+
+
+      <span class="small-title">
+        REGIONAL EXPRESS
+      </span>
+
+
+      <h1>
+        Rastrea tu servicio
+      </h1>
+
+
+      <p>
+        Consulta pedidos Delivery
+        y envíos desde un solo lugar.
+      </p>
+
+    </div>
+
+
+    <!-- ====================================== -->
+    <!-- BUSCADOR -->
+    <!-- ====================================== -->
+
+    <div class="search-card">
+
+      <label>
+        Código de rastreo
+      </label>
+
+
+      <div class="search-row">
+
+        <input
+          [(ngModel)]="codigo"
+          type="text"
+          placeholder="
+            DEL-GT-XXXXX
+            o ENV-GT-XXXXX
+          "
+          (keyup.enter)="buscar()">
+
+
+        <button
+          type="button"
+          [disabled]="buscando"
+          (click)="buscar()">
+
+
+          <span
+            *ngIf="!buscando">
+
+            🔎 Rastrear
+
+          </span>
+
+
+          <span
+            *ngIf="buscando">
+
+            Buscando...
+
+          </span>
+
+        </button>
+
+      </div>
+
+
+      <small>
+
+        Delivery:
+        DEL-GT-XXXXX
+
+        &nbsp; • &nbsp;
+
+        Envíos:
+        ENV-GT-XXXXX
+
+      </small>
+
+    </div>
+
+
+    <!-- ====================================== -->
+    <!-- ERROR -->
+    <!-- ====================================== -->
+
+    <div
+      *ngIf="error"
+      class="
+        alert
+        alert-danger
+        mt-4
+      ">
+
+      {{ error }}
+
+    </div>
+
+
+    <!-- ====================================== -->
+    <!-- RESULTADO -->
+    <!-- ====================================== -->
+
+    <div
+      *ngIf="resultado"
+      class="result-card">
+
+
+      <!-- ====================================== -->
+      <!-- HEADER RESULTADO -->
+      <!-- ====================================== -->
+
+      <p role="status" *ngIf="ultimaActualizacion">Última actualización: {{ ultimaActualizacion | date:'HH:mm:ss' }}. {{ resultado.activo === false ? 'Servicio finalizado.' : 'Se actualiza cada 15 segundos.' }}</p>
+      <p role="status" *ngIf="avisoActualizacion">{{ avisoActualizacion }}</p>
+      <section *ngIf="resultado.activo !== false && resultado.modalidad !== 'RECOGER'" class="tracking-map">
+        <h3>Ubicación del motorista</h3>
+        <app-mapa-rastreo *ngIf="ubicacion?.disponible" [ubicacion]="ubicacion"></app-mapa-rastreo>
+        <p *ngIf="ubicacion?.disponible">Posición recibida: {{ ubicacion.fechaHora | date:'dd/MM/yyyy HH:mm:ss' }}. <strong *ngIf="!ubicacion.reciente">Ubicación antigua; el motorista puede haber dejado de compartir.</strong></p>
+        <p *ngIf="ubicacion?.mensaje" role="status">{{ ubicacion.mensaje }}</p>
+        <p *ngIf="!ubicacion?.disponible && !ubicacion?.mensaje">El motorista aún no ha compartido su ubicación. Debe abrir este servicio en su panel y pulsar «Compartir ubicación». El mapa aparecerá automáticamente al recibir la primera posición.</p>
+      </section>
+      <div class="result-header">
+
+        <div>
+
+          <span class="small-title">
+
+            {{
+              tipoTexto()
+            }}
+
+          </span>
+
+
+          <h2>
+
+            {{
+              tipoIcono()
+            }}
+
+            {{
+              resultado.codigoRastreo
+            }}
+
+          </h2>
+
+        </div>
+
+
+        <span class="status-badge">
+
+          {{ resultado.estado }}
+
+        </span>
+
+      </div>
+
+
+      <!-- ====================================== -->
+      <!-- DATOS GENERALES -->
+      <!-- ====================================== -->
+
+      <div class="information-grid">
+
+
+        <div class="info-card">
+
+          <span>
+            Tipo de servicio
+          </span>
+
+          <strong>
+
+            {{ tipoTexto() }}
+
+          </strong>
+
+        </div>
+
+
+        <div class="info-card">
+
+          <span>
+            Estado actual
+          </span>
+
+          <strong>
+
+            {{ resultado.estado }}
+
+          </strong>
+
+        </div>
+
+
+        <div class="info-card">
+
+          <span>
+            Total
+          </span>
+
+          <strong>
+
+            Q{{
+              total()
+              | number:'1.2-2'
+            }}
+
+          </strong>
+
+        </div>
+
+
+        <div class="info-card">
+
+          <span>
+            Fecha
+          </span>
+
+          <strong>
+
+            {{
+              resultado.fechaCreacion
+              | date:'dd/MM/yyyy HH:mm'
+            }}
+
+          </strong>
+
+        </div>
+
+      </div>
+
+
+      <!-- ====================================== -->
+      <!-- DELIVERY -->
+      <!-- ====================================== -->
+
+      <ng-container
+        *ngIf="esDelivery()">
+
+
+        <div class="information-grid">
+
+
+          <div class="info-card">
+
+            <span>
+              🍽️ Restaurante
+            </span>
+
+            <strong>
+
+              {{
+                resultado.restaurante
+                || 'No disponible'
+              }}
+
+            </strong>
+
+          </div>
+
+
+          <div class="info-card">
+
+            <span>
+              🛵 Modalidad
+            </span>
+
+            <strong>
+
+              {{
+                modalidadTexto()
+              }}
+
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <div
+          *ngIf="
+            resultado.modalidad ===
+            'DOMICILIO'
+          "
+          class="address-card">
+
+          <span>
+            📍 Dirección de entrega
+          </span>
+
+
+          <strong>
+
+            {{
+              resultado.direccionEntrega
+              || 'No disponible'
+            }}
+
+          </strong>
+
+
+          <div
+            *ngIf="
+              resultado.referenciaEntrega
+            "
+            class="mt-2">
+
+            <small>
+              Referencia
+            </small>
+
+            <div>
+
+              {{
+                resultado.referenciaEntrega
+              }}
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <div
+          *ngIf="
+            resultado.modalidad ===
+            'RECOGER'
+          "
+          class="pickup-card">
+
+          🏪
+
+          <div>
+
+            <strong>
+              Pasar a recoger
+            </strong>
+
+            <p>
+              El pedido será recogido
+              directamente en el restaurante.
+            </p>
+
+          </div>
+
+        </div>
+
+      </ng-container>
+
+
+      <!-- ====================================== -->
+      <!-- ENVÍO -->
+      <!-- ====================================== -->
+
+      <ng-container
+        *ngIf="esEnvio()">
+
+
+        <section
+          class="mt-4">
+
+
+          <span class="small-title">
+            DATOS DEL ENVÍO
+          </span>
+
+
+          <h3 class="fw-bold">
+            Remitente y destinatario
+          </h3>
+
+
+          <div class="information-grid">
+
+
+            <div class="info-card">
+
+              <span>
+                📤 Remitente
+              </span>
+
+              <strong>
+
+                {{
+                  resultado.nombreRemitente
+                }}
+
+              </strong>
+
+              <div>
+
+                {{
+                  resultado.telefonoRemitente
+                }}
+
+              </div>
+
+            </div>
+
+
+            <div class="info-card">
+
+              <span>
+                📥 Destinatario
+              </span>
+
+              <strong>
+
+                {{
+                  resultado.nombreDestinatario
+                }}
+
+              </strong>
+
+              <div>
+
+                {{
+                  resultado.telefonoDestinatario
+                }}
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- RUTA -->
+
+        <section class="mt-4">
+
+          <span class="small-title">
+            RUTA
+          </span>
+
+
+          <div class="address-card">
+
+            <span>
+              🟠 Origen
+            </span>
+
+            <strong>
+
+              {{
+                resultado.direccionOrigen
+              }}
+
+            </strong>
+
+
+            <div
+              *ngIf="
+                resultado.referenciaOrigen
+              "
+              class="mt-2">
+
+              <small>
+                Referencia
+              </small>
+
+              <div>
+
+                {{
+                  resultado.referenciaOrigen
+                }}
+
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div class="address-card mt-3">
+
+            <span>
+              🟢 Destino
+            </span>
+
+            <strong>
+
+              {{
+                resultado.direccionDestino
+              }}
+
+            </strong>
+
+
+            <div
+              *ngIf="
+                resultado.referenciaDestino
+              "
+              class="mt-2">
+
+              <small>
+                Referencia
+              </small>
+
+              <div>
+
+                {{
+                  resultado.referenciaDestino
+                }}
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- PAQUETE -->
+
+        <section class="mt-4">
+
+          <span class="small-title">
+            PAQUETE
+          </span>
+
+
+          <div class="information-grid">
+
+
+            <div class="info-card">
+
+              <span>
+                📦 Tipo
+              </span>
+
+              <strong>
+
+                {{
+                  resultado.tipoPaquete
+                }}
+
+              </strong>
+
+            </div>
+
+
+            <div class="info-card">
+
+              <span>
+                ⚖️ Peso
+              </span>
+
+              <strong>
+
+                {{
+                  resultado.peso
+                  | number:'1.1-2'
+                }}
+                lb
+
+              </strong>
+
+            </div>
+
+          </div>
+
+
+          <div
+            *ngIf="
+              resultado.descripcionPaquete
+            "
+            class="address-card">
+
+            <span>
+              Descripción
+            </span>
+
+            <strong>
+
+              {{
+                resultado.descripcionPaquete
+              }}
+
+            </strong>
+
+          </div>
+
+        </section>
+
+
+        <!-- COSTOS -->
+
+        <section class="mt-4">
+
+          <span class="small-title">
+            COSTOS
+          </span>
+
+
+          <div class="information-grid">
+
+
+            <div class="info-card">
+
+              <span>
+                Tarifa base
+              </span>
+
+              <strong>
+
+                Q{{
+                  resultado.tarifaBase
+                  | number:'1.2-2'
+                }}
+
+              </strong>
+
+            </div>
+
+
+            <div class="info-card">
+
+              <span>
+                Distancia
+              </span>
+
+              <strong>
+
+                Q{{
+                  resultado.costoDistancia
+                  | number:'1.2-2'
+                }}
+
+              </strong>
+
+            </div>
+
+
+            <div class="info-card">
+
+              <span>
+                Peso
+              </span>
+
+              <strong>
+
+                Q{{
+                  resultado.costoPeso
+                  | number:'1.2-2'
+                }}
+
+              </strong>
+
+            </div>
+
+
+            <div class="info-card">
+
+              <span>
+                Total
+              </span>
+
+              <strong>
+
+                Q{{
+                  resultado.total
+                  | number:'1.2-2'
+                }}
+
+              </strong>
+
+            </div>
+
+          </div>
+
+        </section>
+
+      </ng-container>
+
+
+      <!-- ====================================== -->
+      <!-- SEGUIMIENTO DINÁMICO -->
+      <!-- ====================================== -->
+
+      <section class="progress-section">
+
+        <span class="small-title">
+          SEGUIMIENTO
+        </span>
+
+
+        <h3>
+          Estado del servicio
+        </h3>
+
+
+        <div class="timeline">
+
+
+          <div
+            *ngFor="
+              let estado
+              of resultado.estados
+            "
+            class="timeline-item"
+
+            [class.completed]="
+              estadoAlcanzado(
+                estado.orden
+              )
+            ">
+
+
+            <div class="circle">
+
+              {{
+                estado.orden
+              }}
+
+            </div>
+
+
+            <div>
+
+              <strong>
+
+                {{
+                  estado.nombre
+                }}
+
+              </strong>
+
+
+              <p
+                *ngIf="
+                  resultado.ordenEstado ===
+                  estado.orden
+                ">
+
+                Estado actual
+
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ====================================== -->
+      <!-- ACCIONES -->
+      <!-- ====================================== -->
+
+      <div class="tracking-actions">
+
+        <button
+          type="button"
+          class="btn-secondary-custom"
+          (click)="limpiar()">
+
+          Buscar otro código
+
+        </button>
+
+
+        <a
+          *ngIf="esDelivery()"
+          routerLink="/delivery"
+          class="btn-primary-custom">
+
+          🍔 Hacer otro pedido
+
+        </a>
+
+
+        <a
+          *ngIf="esEnvio()"
+          routerLink="/envios"
+          class="btn-primary-custom">
+
+          📦 Crear otro envío
+
+        </a>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>

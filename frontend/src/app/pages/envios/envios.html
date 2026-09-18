@@ -1,0 +1,910 @@
+<section
+  class="shipping-page notranslate"
+  translate="no">
+
+  <div class="container py-5">
+
+
+    <!-- ====================================== -->
+    <!-- VOLVER -->
+    <!-- ====================================== -->
+
+    <a
+      routerLink="/"
+      class="back-link">
+
+      ← Volver al inicio
+
+    </a>
+
+
+    <!-- ====================================== -->
+    <!-- ENCABEZADO -->
+    <!-- ====================================== -->
+
+    <header class="shipping-header">
+
+      <div>
+
+        <span class="small-title">
+          REGIONAL EXPRESS
+        </span>
+
+
+        <h1>
+          📦 Envíos
+        </h1>
+
+
+        <p>
+          Envía paquetes de forma rápida,
+          sencilla y segura.
+        </p>
+
+      </div>
+
+
+      <div class="shipping-logo">
+        🚚
+      </div>
+
+    </header>
+
+
+    <!-- ====================================== -->
+    <!-- CONFIRMACIÓN -->
+    <!-- ====================================== -->
+
+    <section
+      *ngIf="envioConfirmado"
+      class="success-card">
+
+      <div class="success-icon">
+        ✅
+      </div>
+
+
+      <span class="small-title">
+        ENVÍO REGISTRADO
+      </span>
+
+
+      <h2>
+        ¡Tu envío está listo!
+      </h2>
+
+
+      <p>
+        Guarda el siguiente código para
+        consultar el estado de tu paquete.
+      </p>
+
+
+      <div class="tracking-code">
+
+        {{ codigoRastreo }}
+
+      </div>
+
+
+      <p role="status">Correo de confirmación: {{ correoConfirmacion }}</p>
+<div class="success-actions">
+
+        <a
+          routerLink="/rastreo"
+          class="primary-btn">
+
+          🔎 Rastrear envío
+
+        </a>
+
+
+        <button
+          type="button"
+          class="secondary-btn"
+          (click)="nuevoEnvio()">
+
+          📦 Crear otro envío
+
+        </button>
+
+      </div>
+
+    </section>
+
+
+    <!-- ====================================== -->
+    <!-- FORMULARIO -->
+    <!-- ====================================== -->
+
+    <div
+      *ngIf="!envioConfirmado"
+      class="shipping-layout">
+
+
+      <!-- ====================================== -->
+      <!-- FORMULARIO PRINCIPAL -->
+      <!-- ====================================== -->
+
+      <main class="shipping-form">
+
+
+        <!-- ====================================== -->
+        <!-- REMITENTE -->
+        <!-- ====================================== -->
+
+        <section class="form-card">
+
+          <div class="section-heading">
+
+            <div class="section-number">
+              1
+            </div>
+
+            <div>
+
+              <span class="small-title">
+                REMITENTE
+              </span>
+
+              <h2>
+                ¿Quién envía?
+              </h2>
+
+            </div>
+
+          </div>
+
+
+          <div class="form-grid">
+
+
+            <div
+              class="field
+              field-full">
+
+              <label>
+                Nombre completo *
+              </label>
+
+              <input
+                [(ngModel)]="nombreRemitente"
+                type="text"
+                placeholder="Ej. Ana Martinez">
+
+            </div>
+
+
+            <div class="field">
+
+              <label>
+                Teléfono *
+              </label>
+
+              <input
+                [(ngModel)]="telefonoRemitente"
+                type="text"
+                placeholder="Ej. 55551234">
+
+            </div>
+
+
+            <div class="field">
+
+              <label>
+                Correo
+              </label>
+
+              <input
+                [(ngModel)]="correoRemitente"
+                type="email"
+                placeholder="correo@ejemplo.com">
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ====================================== -->
+        <!-- DESTINATARIO -->
+        <!-- ====================================== -->
+
+        <section class="form-card">
+
+          <div class="section-heading">
+
+            <div class="section-number">
+              2
+            </div>
+
+            <div>
+
+              <span class="small-title">
+                DESTINATARIO
+              </span>
+
+              <h2>
+                ¿Quién recibe?
+              </h2>
+
+            </div>
+
+          </div>
+
+
+          <div class="form-grid">
+
+
+            <div
+              class="field
+              field-full">
+
+              <label>
+                Nombre completo *
+              </label>
+
+              <input
+                [(ngModel)]="nombreDestinatario"
+                type="text"
+                placeholder="Ej. Carlos Lopez">
+
+            </div>
+
+
+            <div class="field">
+
+              <label>
+                Teléfono *
+              </label>
+
+              <input
+                [(ngModel)]="telefonoDestinatario"
+                type="text"
+                placeholder="Ej. 55559876">
+
+            </div>
+
+
+            <div class="field">
+
+              <label>
+                Correo
+              </label>
+
+              <input
+                [(ngModel)]="correoDestinatario"
+                type="email"
+                placeholder="correo@ejemplo.com">
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ====================================== -->
+        <!-- RUTA -->
+        <!-- ====================================== -->
+
+        <section class="form-card">
+
+          <div class="section-heading">
+
+            <div class="section-number">
+              3
+            </div>
+
+            <div>
+
+              <span class="small-title">
+                RUTA
+              </span>
+
+              <h2>
+                Origen y destino
+              </h2>
+
+            </div>
+
+          </div>
+
+
+          <div class="route-box">
+
+
+            <!-- ORIGEN -->
+
+            <div class="route-point">
+
+              <div
+                class="
+                  route-circle
+                  origin
+                ">
+
+                A
+
+              </div>
+
+
+              <div class="route-content">
+
+                <label>
+                  Dirección de origen *
+                </label>
+
+                <input
+                  [(ngModel)]="direccionOrigen"
+                  type="text"
+                  placeholder="
+                    Ej. San Raymundo,
+                    Guatemala
+                  ">
+
+
+                <label>
+                  Referencia de origen
+                </label>
+
+                <textarea
+                  [(ngModel)]="referenciaOrigen"
+                  rows="2"
+                  placeholder="
+                    Casa, local,
+                    color del portón...
+                  ">
+                </textarea>
+
+              </div>
+
+            </div>
+
+
+            <div class="route-line"></div>
+
+
+            <!-- DESTINO -->
+
+            <div class="route-point">
+
+              <div
+                class="
+                  route-circle
+                  destination
+                ">
+
+                B
+
+              </div>
+
+
+              <div class="route-content">
+
+                <label>
+                  Dirección de destino *
+                </label>
+
+                <input
+                  [(ngModel)]="direccionDestino"
+                  type="text"
+                  placeholder="
+                    Ej. Chinautla,
+                    Guatemala
+                  ">
+
+
+                <label>
+                  Referencia de destino
+                </label>
+
+                <textarea
+                  [(ngModel)]="referenciaDestino"
+                  rows="2"
+                  placeholder="
+                    Casa, negocio
+                    o referencia...
+                  ">
+                </textarea>
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- ====================================== -->
+        <!-- PAQUETE -->
+        <!-- ====================================== -->
+
+        <section class="form-card">
+
+          <div class="section-heading">
+
+            <div class="section-number">
+              4
+            </div>
+
+            <div>
+
+              <span class="small-title">
+                PAQUETE
+              </span>
+
+              <h2>
+                Información del paquete
+              </h2>
+
+            </div>
+
+          </div>
+
+
+          <div class="form-grid">
+
+
+            <div class="field">
+
+              <label>
+                Tipo de paquete *
+              </label>
+
+              <select
+                [(ngModel)]="tipoPaquete">
+
+                <option value="CAJA">
+                  📦 Caja
+                </option>
+
+                <option value="SOBRE">
+                  ✉️ Sobre
+                </option>
+
+                <option value="BOLSA">
+                  🛍️ Bolsa
+                </option>
+
+                <option value="DOCUMENTOS">
+                  📄 Documentos
+                </option>
+
+                <option value="OTRO">
+                  📍 Otro
+                </option>
+
+              </select>
+
+            </div>
+
+
+            <div class="field">
+
+              <label>
+                Peso aproximado (lb) *
+              </label>
+
+              <input
+                [(ngModel)]="peso"
+                (ngModelChange)="datosModificados()"
+                type="number"
+                min="0.1"
+                step="0.1"
+                placeholder="Ej. 5">
+
+            </div>
+
+
+            <div
+              class="
+                field
+                field-full
+              ">
+
+              <label>
+                Distancia aproximada (km) *
+              </label>
+
+              <input
+                [(ngModel)]="distanciaKm"
+                (ngModelChange)="datosModificados()"
+                type="number"
+                min="0"
+                step="0.1"
+                placeholder="Ej. 10">
+
+              <small>
+                Más adelante esta distancia
+                será obtenida automáticamente
+                mediante el mapa.
+              </small>
+
+            </div>
+
+
+            <div
+              class="
+                field
+                field-full
+              ">
+
+              <label>
+                Descripción del paquete
+              </label>
+
+              <textarea
+                [(ngModel)]="descripcionPaquete"
+                rows="3"
+                placeholder="
+                  Ej. Documentos,
+                  ropa, artículos personales...
+                ">
+              </textarea>
+
+            </div>
+
+          </div>
+
+
+          <!-- CALCULAR -->
+
+          <button
+            type="button"
+            class="calculate-btn"
+            [disabled]="calculando"
+            (click)="calcularTarifa()">
+
+
+            <span
+              *ngIf="!calculando">
+
+              🧮 Calcular costo de envío
+
+            </span>
+
+
+            <span
+              *ngIf="calculando">
+
+              Calculando...
+
+            </span>
+
+          </button>
+
+        </section>
+
+      </main>
+
+
+      <!-- ====================================== -->
+      <!-- RESUMEN -->
+      <!-- ====================================== -->
+
+      <aside class="summary-card">
+
+        <span class="small-title">
+          RESUMEN
+        </span>
+
+
+        <h2>
+          Tu envío
+        </h2>
+
+
+        <div class="summary-route">
+
+          <div>
+
+            <span class="route-dot origin-dot">
+            </span>
+
+            <div>
+
+              <small>
+                Origen
+              </small>
+
+              <strong>
+
+                {{
+                  direccionOrigen
+                  || 'Pendiente'
+                }}
+
+              </strong>
+
+            </div>
+
+          </div>
+
+
+          <div>
+
+            <span
+              class="
+                route-dot
+                destination-dot
+              ">
+            </span>
+
+            <div>
+
+              <small>
+                Destino
+              </small>
+
+              <strong>
+
+                {{
+                  direccionDestino
+                  || 'Pendiente'
+                }}
+
+              </strong>
+
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <hr>
+
+
+        <div class="package-summary">
+
+          <div>
+
+            <span>
+              Tipo
+            </span>
+
+            <strong>
+              {{ tipoPaquete }}
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            <span>
+              Peso
+            </span>
+
+            <strong>
+
+              {{
+                peso || 0
+              }}
+              lb
+
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            <span>
+              Distancia
+            </span>
+
+            <strong>
+
+              {{
+                distanciaKm || 0
+              }}
+              km
+
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <!-- ====================================== -->
+        <!-- TARIFA -->
+        <!-- ====================================== -->
+
+        <div
+          *ngIf="!tarifaCalculada"
+          class="pending-price">
+
+          <div>
+            🧮
+          </div>
+
+          <strong>
+            Calcula la tarifa
+          </strong>
+
+          <p>
+            Ingresa el peso y la distancia
+            para conocer el costo.
+          </p>
+
+        </div>
+
+
+        <div
+          *ngIf="tarifaCalculada"
+          class="price-summary">
+
+
+          <div>
+
+            <span>
+              Tarifa base
+            </span>
+
+            <strong>
+
+              Q{{
+                tarifaCalculada.tarifaBase
+                | number:'1.2-2'
+              }}
+
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            <span>
+              Distancia
+            </span>
+
+            <strong>
+
+              Q{{
+                tarifaCalculada.costoDistancia
+                | number:'1.2-2'
+              }}
+
+            </strong>
+
+          </div>
+
+
+          <div>
+
+            <span>
+              Peso
+            </span>
+
+            <strong>
+
+              Q{{
+                tarifaCalculada.costoPeso
+                | number:'1.2-2'
+              }}
+
+            </strong>
+
+          </div>
+
+
+          <hr>
+
+
+          <div class="total-row">
+
+            <span>
+              TOTAL
+            </span>
+
+            <strong>
+
+              Q{{
+                tarifaCalculada.total
+                | number:'1.2-2'
+              }}
+
+            </strong>
+
+          </div>
+
+        </div>
+
+
+        <!-- ====================================== -->
+        <!-- ERROR -->
+        <!-- ====================================== -->
+
+        <div
+          *ngIf="error"
+          class="
+            alert
+            alert-danger
+            mt-3
+          ">
+
+          {{ error }}
+
+        </div>
+
+
+        <!-- ====================================== -->
+        <!-- MENSAJE -->
+        <!-- ====================================== -->
+
+        <div
+          *ngIf="mensaje"
+          class="
+            alert
+            alert-success
+            mt-3
+          ">
+
+          {{ mensaje }}
+
+        </div>
+
+
+        <!-- ====================================== -->
+        <!-- CONFIRMAR -->
+        <!-- ====================================== -->
+
+        <button
+          type="button"
+          class="confirm-btn"
+          [disabled]="
+            procesando ||
+            !tarifaCalculada
+          "
+          (click)="confirmarEnvio()">
+
+
+          <span
+            *ngIf="!procesando">
+
+            Confirmar envío
+
+          </span>
+
+
+          <span
+            *ngIf="procesando">
+
+            Registrando...
+
+          </span>
+
+
+          <span
+            *ngIf="tarifaCalculada">
+
+            Q{{
+              tarifaCalculada.total
+              | number:'1.2-2'
+            }}
+
+          </span>
+
+        </button>
+
+
+        <small class="terms">
+
+          Al confirmar aceptas que los datos
+          proporcionados son correctos.
+
+        </small>
+
+      </aside>
+
+    </div>
+
+  </div>
+
+</section>

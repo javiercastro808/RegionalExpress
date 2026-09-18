@@ -1,0 +1,273 @@
+:host {
+  display: block;
+}
+
+.panel-page {
+  min-height: 100vh;
+
+  display: grid;
+  grid-template-columns:
+    270px 1fr;
+
+  background: #f3f6f8;
+
+  font-family:
+    Arial,
+    Helvetica,
+    sans-serif;
+}
+
+.sidebar {
+  background: #172431;
+  color: white;
+
+  padding: 28px 20px;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.brand {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  padding-bottom: 28px;
+
+  border-bottom:
+    1px solid
+    rgba(255,255,255,.1);
+}
+
+.brand > span {
+  font-size: 32px;
+}
+
+.brand strong,
+.brand small {
+  display: block;
+}
+
+.brand small {
+  color: #9eabb7;
+  margin-top: 4px;
+}
+
+nav {
+  display: grid;
+  gap: 8px;
+
+  margin-top: 30px;
+}
+
+.menu-item {
+  display: block;
+
+  padding: 14px 16px;
+
+  border-radius: 10px;
+
+  color: #dce4ea;
+
+  text-decoration: none;
+
+  cursor: pointer;
+}
+
+.menu-item:hover {
+  background:
+    rgba(255,255,255,.08);
+
+  color: white;
+}
+
+.logout {
+  margin-top: auto;
+
+  border: none;
+
+  padding: 14px;
+
+  border-radius: 10px;
+
+  background:
+    rgba(255,255,255,.08);
+
+  color: white;
+
+  font-weight: 800;
+
+  cursor: pointer;
+}
+
+.content {
+  padding: 40px;
+}
+
+.topbar {
+  display: flex;
+
+  justify-content:
+    space-between;
+
+  gap: 25px;
+
+  align-items: center;
+}
+
+.topbar span {
+  color: #e58a00;
+
+  font-weight: 900;
+
+  letter-spacing: 1.5px;
+}
+
+.topbar h1 {
+  margin: 6px 0;
+
+  font-size: 36px;
+
+  color: #17202b;
+}
+
+.topbar p {
+  color: #667085;
+}
+
+.user-card {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+
+  background: white;
+
+  padding: 12px 18px;
+
+  border-radius: 14px;
+
+  box-shadow:
+    0 5px 20px
+    rgba(15,23,42,.06);
+}
+
+.avatar {
+  width: 42px;
+  height: 42px;
+
+  border-radius: 50%;
+
+  background: #f59e0b;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  font-weight: 900;
+}
+
+.user-card strong,
+.user-card small {
+  display: block;
+}
+
+.user-card small {
+  color: #667085;
+  margin-top: 3px;
+}
+
+.welcome {
+  margin-top: 35px;
+
+  padding: 28px;
+
+  border-radius: 20px;
+
+  background: white;
+
+  display: flex;
+  gap: 20px;
+  align-items: center;
+
+  box-shadow:
+    0 8px 25px
+    rgba(15,23,42,.06);
+}
+
+.welcome-icon {
+  font-size: 40px;
+}
+
+.welcome h2 {
+  margin: 0 0 7px;
+}
+
+.welcome p {
+  margin: 0;
+  color: #667085;
+}
+
+.cards {
+  margin-top: 30px;
+
+  display: grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(220px,1fr)
+    );
+
+  gap: 20px;
+}
+
+.cards article {
+  background: white;
+
+  padding: 28px;
+
+  border-radius: 18px;
+
+  box-shadow:
+    0 8px 25px
+    rgba(15,23,42,.05);
+}
+
+.cards article > span {
+  font-size: 35px;
+}
+
+.cards h3 {
+  margin:
+    18px 0
+    8px;
+
+  color: #17202b;
+}
+
+.cards p {
+  color: #667085;
+  line-height: 1.5;
+}
+
+@media (
+  max-width: 850px
+) {
+
+  .panel-page {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    min-height: auto;
+  }
+
+  .content {
+    padding: 25px;
+  }
+
+  .topbar {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}

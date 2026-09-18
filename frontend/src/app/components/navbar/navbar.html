@@ -1,0 +1,15 @@
+<nav class="site-nav" aria-label="Navegación principal" *ngIf="sesion$ | async as sesion">
+  <a class="brand" [routerLink]="sesion.usuario ? sesion.panel : '/'" aria-label="Regional Express, inicio"><span class="brand-symbol">RE</span><span>Regional <strong>Express</strong></span></a>
+  <div class="nav-links">
+    <a [routerLink]="sesion.usuario ? sesion.panel : '/'" routerLinkActive="current" [routerLinkActiveOptions]="{exact:true}">Inicio</a>
+    <a routerLink="/delivery" routerLinkActive="current">Delivery</a>
+    <a routerLink="/envios" routerLinkActive="current">Envíos</a>
+    <a routerLink="/rastreo" routerLinkActive="current">Rastreo</a>
+  </div>
+  <div class="account" *ngIf="sesion.usuario; else ingresar">
+    <span class="account-name">{{ sesion.usuario.nombre }}</span>
+    <a class="account-button" [routerLink]="sesion.panel">Mi panel</a>
+    <button type="button" class="logout-button" (click)="salir()">Salir</button>
+  </div>
+  <ng-template #ingresar><a class="account-button" routerLink="/login">Ingresar</a></ng-template>
+</nav>

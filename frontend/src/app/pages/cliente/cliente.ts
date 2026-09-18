@@ -1,0 +1,22 @@
+import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
+import { API_URL } from '../../services/api-url';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { FormsModule } from '@angular/forms';
+import { Auth } from '../../services/auth';
+@Component({ selector:'app-cliente', standalone:true, imports:[CommonModule, RouterLink, FormsModule], template:
+`<main class="client-panel"><span class="eyebrow">MI CUENTA</span><h1>Hola, {{ auth.getUsuario()?.nombre }}</h1><p>Tus pedidos y envíos, desde un mismo lugar.</p><div class="client-grid"><a routerLink="/delivery"><h2>Pedir comida</h2><p>Explora el menú y elige tus favoritos.</p><strong>Ver restaurantes →</strong></a><a routerLink="/envios"><h2>Enviar un paquete</h2><p>Consulta el costo y solicita tu envío.</p><strong>Crear envío →</strong></a></div><section class="historial"><h2>Mis pedidos y envíos</h2><button type="button" (click)="cargar()" [disabled]="cargando">Actualizar</button><p *ngIf="cargando" role="status">Cargando servicios…</p><p *ngIf="error" role="alert">{{error}}</p><p *ngIf="!cargando && !error && !servicios.length">Aún no tienes servicios registrados.</p><div class="tabla"><table *ngIf="servicios.length"><thead><tr><th>Código</th><th>Estado</th><th>Fecha</th><th>Total</th><th>Rastreo</th></tr></thead><tbody><tr *ngFor="let s of servicios; trackBy: identificar"><td>{{s.codigoRastreo}}</td><td>{{s.estado}}</td><td>{{s.fechaCreacion | date:'dd/MM/yyyy HH:mm'}}</td><td>{{s.total | currency:'GTQ':'Q'}}</td><td><a routerLink="/rastreo" [queryParams]="{codigo:s.codigoRastreo}">Ver mapa y estado</a></td></tr></tbody></table></div><nav *ngIf="total > 20" aria-label="Páginas del historial"><button (click)="cargar(pagina-1)" [disabled]="cargando || pagina===1">Anterior</button> Página {{pagina}} <button (click)="cargar(pagina+1)" [disabled]="cargando || pagina*20>=total">Siguiente</button></nav></section><form (ngSubmit)="rastrear()"><h2>Seguir un servicio</h2><label for="codigo-cliente">Código de rastreo</label><div><input id="codigo-cliente" name="codigo" [(ngModel)]="codigo" placeholder="ENV-GT-38184" required><button type="submit" [disabled]="!codigo.trim()">Ver estado y mapa</button></div></form></main>`, styles:[`.historial{background:white;padding:24px;border-radius:20px;margin:24px 0}.tabla{overflow-x:auto}table{width:100%;border-collapse:collapse}th,td{text-align:left;padding:12px;border-bottom:1px solid #e0e6e8;white-space:nowrap}button:disabled{opacity:.5}.client-panel{max-width:1100px;margin:0 auto;padding:48px 24px;color:#17313b}.eyebrow{font-size:12px;font-weight:800;letter-spacing:2px;color:#a86700}h1{margin:12px 0;font-size:36px}.client-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:32px 0}.client-grid a,form{padding:28px;background:#fff;border:1px solid #e0e6e8;border-radius:20px;color:inherit;text-decoration:none}.client-grid a:hover{border-color:#c88b20}h2{font-size:23px}form label{display:block;margin:16px 0 8px}input{padding:12px;border:1px solid #bdcbce;border-radius:10px;margin-right:10px}button{padding:12px;border:0;border-radius:10px;background:#f6aa1c;font-weight:700}@media(max-width:650px){.client-grid{grid-template-columns:1fr}input,button{width:100%;margin:5px 0}}`]})
+export class Cliente implements OnInit {
+ servicios: {idServicio:number; codigoRastreo:string; estado:string; fechaCreacion:string; total:number}[]=[]; total=0; pagina=1; cargando=false; error="";
+ ngOnInit():void{this.cargar();}
+ identificar(_i:number,s:{idServicio:number}):number{return s.idServicio;}
+ cargar(pagina=this.pagina):void {
+ if(this.cargando)return; this.cargando=true;this.error="";
+ this.http.get<{items:Cliente['servicios'];total:number}>(`${API_URL}/Cliente/servicios`,{params:{pagina}}).subscribe({next:r=>{this.servicios=r.items;this.total=r.total;this.pagina=pagina;this.cargando=false;this.cdr.markForCheck();},error:e=>{this.error=e.status===401?"Tu sesión venció. Inicia sesión nuevamente.":"No se pudo cargar el historial. Pulsa Actualizar para reintentar.";this.cargando=false;this.cdr.markForCheck();}});
+ }
+ codigo='';
+ constructor(public auth:Auth,private router:Router,private http:HttpClient,private cdr:ChangeDetectorRef){}
+ rastrear():void{if(this.codigo.trim())this.router.navigate(['/rastreo'],{queryParams:{codigo:this.codigo.trim().toUpperCase()}});}
+}
+

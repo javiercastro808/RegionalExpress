@@ -1,0 +1,28 @@
+name: Verificar Regional Express
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  comprobar:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - name: Instalar frontend
+        run: npm ci
+        working-directory: frontend
+      - name: Verificar y preparar publicación
+        shell: pwsh
+        run: ./scripts/Preparar-Publicacion.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: regional-express-publicacion
+          path: artifacts/publicacion-*.zip
+          retention-days: 1

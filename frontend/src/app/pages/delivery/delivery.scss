@@ -1,0 +1,107 @@
+.delivery-page {
+  min-height: calc(100vh - 120px);
+
+  background:
+    linear-gradient(
+      135deg,
+      #fff8e8,
+      #f8f8f8
+    );
+}
+
+.delivery-header h1 {
+  font-size: 2.6rem;
+}
+
+.restaurant-card {
+  height: 100%;
+
+  background: white;
+
+  border-radius: 22px;
+
+  overflow: hidden;
+
+  box-shadow:
+    0 10px 30px rgba(0, 0, 0, 0.08);
+
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.restaurant-card:hover {
+  transform: translateY(-6px);
+
+  box-shadow:
+    0 16px 40px rgba(0, 0, 0, 0.13);
+}
+
+.restaurant-image {
+  height: 190px;
+
+  background: #eeeeee;
+
+  overflow: hidden;
+}
+
+.restaurant-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.restaurant-placeholder {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  font-size: 70px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ffc107,
+      #ffda68
+    );
+}
+
+.restaurant-content {
+  padding: 25px;
+}
+
+.restaurant-content h3 {
+  margin-top: 10px;
+
+  font-weight: 700;
+}
+
+.status {
+  color: #198754;
+
+  font-size: 0.9rem;
+
+  font-weight: 600;
+}
+
+.description {
+  min-height: 48px;
+
+  color: #666;
+}
+
+.restaurant-info {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 7px;
+
+  color: #555;
+
+  font-size: 0.92rem;
+}

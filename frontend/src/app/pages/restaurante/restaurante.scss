@@ -1,0 +1,675 @@
+.restaurant-page {
+  min-height: 100vh;
+  background: #f5f5f3;
+  color: #202124;
+}
+
+.loading {
+  min-height: 500px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  justify-content: center;
+  align-items: center;
+}
+
+.back-link {
+  display: inline-block;
+
+  margin-bottom: 20px;
+
+  color: #333;
+
+  text-decoration: none;
+
+  font-weight: 600;
+}
+
+.restaurant-hero {
+  min-height: 250px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 45px;
+
+  border-radius: 30px;
+
+  color: white;
+
+  background:
+    linear-gradient(
+      135deg,
+      #191919 0%,
+      #2c2c2c 60%,
+      #3c2c05 100%
+    );
+
+  box-shadow:
+    0 20px 50px
+    rgba(0, 0, 0, 0.13);
+}
+
+.restaurant-hero h1 {
+  margin-top: 20px;
+
+  font-size: 3rem;
+
+  font-weight: 800;
+}
+
+.restaurant-hero p {
+  max-width: 650px;
+
+  font-size: 1.05rem;
+
+  color: #ddd;
+}
+
+.restaurant-badges {
+  display: flex;
+
+  gap: 10px;
+}
+
+.badge-open,
+.badge-delivery {
+  padding: 8px 14px;
+
+  border-radius: 30px;
+
+  font-size: 0.85rem;
+
+  font-weight: 700;
+}
+
+.badge-open {
+  background: #1ca759;
+}
+
+.badge-delivery {
+  background: #ffc107;
+
+  color: #111;
+}
+
+.restaurant-meta {
+  display: flex;
+
+  flex-wrap: wrap;
+
+  gap: 20px;
+
+  margin-top: 25px;
+}
+
+.restaurant-logo {
+  width: 150px;
+  height: 150px;
+
+  flex-shrink: 0;
+
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 35px;
+
+  font-size: 75px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #ffc107,
+      #ffdd76
+    );
+}
+
+.layout {
+  margin-top: 35px;
+
+  display: grid;
+
+  grid-template-columns:
+    minmax(0, 1fr)
+    390px;
+
+  gap: 30px;
+
+  align-items: start;
+}
+
+.menu-title {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: flex-end;
+
+  margin-bottom: 25px;
+}
+
+.menu-title h2 {
+  margin: 3px 0 0;
+
+  font-size: 2rem;
+
+  font-weight: 800;
+}
+
+.small-title {
+  color: #8b8b8b;
+
+  font-size: 0.75rem;
+
+  font-weight: 800;
+
+  letter-spacing: 1.5px;
+}
+
+.product-count {
+  color: #777;
+}
+
+.product-grid {
+  display: grid;
+
+  grid-template-columns:
+    repeat(2, minmax(0, 1fr));
+
+  gap: 20px;
+}
+
+.product-card {
+  position: relative;
+
+  overflow: hidden;
+
+  background: white;
+
+  border:
+    1px solid #eeeeec;
+
+  border-radius: 22px;
+
+  box-shadow:
+    0 8px 25px
+    rgba(0, 0, 0, 0.05);
+
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease;
+}
+
+.product-card:hover {
+  transform:
+    translateY(-4px);
+
+  box-shadow:
+    0 14px 35px
+    rgba(0, 0, 0, 0.09);
+}
+
+.product-image {
+  position: relative;
+
+  height: 190px;
+
+  overflow: hidden;
+
+  background: #ececea;
+}
+
+.product-image img {
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+}
+
+.placeholder {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  font-size: 70px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #fff0b3,
+      #ffc107
+    );
+}
+
+.quantity-badge {
+  position: absolute;
+
+  top: 12px;
+  right: 12px;
+
+  width: 35px;
+  height: 35px;
+
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 50%;
+
+  color: white;
+
+  background: #1d1d1d;
+
+  font-weight: 800;
+}
+
+.product-content {
+  padding: 20px;
+}
+
+.product-content h3 {
+  font-size: 1.25rem;
+
+  font-weight: 800;
+}
+
+.product-content p {
+  min-height: 48px;
+
+  margin-bottom: 18px;
+
+  color: #707070;
+
+  font-size: .93rem;
+}
+
+.product-bottom {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+}
+
+.price {
+  font-size: 1.35rem;
+
+  font-weight: 800;
+}
+
+.btn-add {
+  padding:
+    10px 18px;
+
+  border: 0;
+
+  border-radius: 12px;
+
+  color: #111;
+
+  background: #ffc107;
+
+  font-weight: 800;
+
+  transition: .2s;
+}
+
+.btn-add:hover {
+  background: #eeb200;
+
+  transform:
+    scale(1.03);
+}
+
+.cart {
+  position: sticky;
+
+  top: 20px;
+
+  overflow: hidden;
+
+  padding: 25px;
+
+  background: white;
+
+  border:
+    1px solid #e8e8e5;
+
+  border-radius: 25px;
+
+  box-shadow:
+    0 12px 35px
+    rgba(0, 0, 0, 0.07);
+}
+
+.cart-header {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+
+  margin-bottom: 20px;
+}
+
+.cart-header h3 {
+  margin: 4px 0 0;
+
+  font-weight: 800;
+}
+
+.cart-counter {
+  min-width: 36px;
+  height: 36px;
+
+  display: flex;
+
+  justify-content: center;
+  align-items: center;
+
+  border-radius: 50%;
+
+  background: #ffc107;
+
+  font-weight: 800;
+}
+
+.empty-cart {
+  padding:
+    50px 20px;
+
+  text-align: center;
+
+  color: #777;
+}
+
+.empty-icon {
+  margin-bottom: 15px;
+
+  font-size: 55px;
+}
+
+.empty-cart p {
+  margin-top: 7px;
+}
+
+.cart-item {
+  padding:
+    15px 0;
+
+  border-bottom:
+    1px solid #efefed;
+}
+
+.cart-item-main {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 3px;
+}
+
+.cart-item-main small {
+  color: #888;
+}
+
+.cart-item-bottom {
+  margin-top: 12px;
+
+  display: grid;
+
+  grid-template-columns:
+    auto 1fr auto;
+
+  align-items: center;
+
+  gap: 12px;
+}
+
+.cart-item-bottom > strong {
+  text-align: right;
+}
+
+.quantity-control {
+  display: flex;
+
+  align-items: center;
+
+  gap: 8px;
+}
+
+.quantity-control button {
+  width: 32px;
+  height: 32px;
+
+  border: 0;
+
+  border-radius: 10px;
+
+  background: #f0f0ed;
+
+  font-size: 19px;
+
+  font-weight: 700;
+}
+
+.quantity-control span {
+  min-width: 20px;
+
+  text-align: center;
+
+  font-weight: 800;
+}
+
+.remove {
+  border: 0;
+
+  background: transparent;
+}
+
+.delivery-mode {
+  margin-top: 25px;
+}
+
+.mode-grid {
+  margin-top: 10px;
+
+  display: grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap: 10px;
+}
+
+.mode-card {
+  min-height: 115px;
+
+  padding: 13px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  justify-content: center;
+  align-items: center;
+
+  gap: 4px;
+
+  border:
+    2px solid #e5e5e2;
+
+  border-radius: 16px;
+
+  background: #fafafa;
+
+  transition: .2s;
+}
+
+.mode-card.active {
+  border-color:
+    #ffc107;
+
+  background:
+    #fff8dc;
+}
+
+.mode-card small {
+  color: #777;
+
+  font-size: .72rem;
+
+  text-align: center;
+}
+
+.mode-icon {
+  font-size: 30px;
+}
+
+.address-box {
+  margin-top: 20px;
+}
+
+.address-box label {
+  display: block;
+
+  margin:
+    10px 0 6px;
+
+  font-size: .85rem;
+
+  font-weight: 700;
+}
+
+.address-box input,
+.address-box textarea {
+  width: 100%;
+
+  padding:
+    11px 12px;
+
+  border:
+    1px solid #ddd;
+
+  border-radius: 12px;
+
+  outline: none;
+}
+
+.address-box input:focus,
+.address-box textarea:focus {
+  border-color:
+    #ffc107;
+}
+
+.summary {
+  margin-top: 25px;
+
+  padding-top: 20px;
+
+  border-top:
+    1px solid #ececea;
+}
+
+.summary > div {
+  margin-bottom: 9px;
+
+  display: flex;
+
+  justify-content: space-between;
+}
+
+.summary hr {
+  margin:
+    15px 0;
+}
+
+.total-row {
+  font-size: 1.3rem;
+}
+
+.checkout-btn {
+  width: 100%;
+
+  margin-top: 18px;
+
+  padding: 15px;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  border: 0;
+
+  border-radius: 15px;
+
+  background: #191919;
+
+  color: white;
+
+  font-size: 1rem;
+
+  font-weight: 800;
+}
+
+.checkout-btn:hover {
+  background: #000;
+}
+
+@media (
+  max-width: 1000px
+) {
+
+  .layout {
+    grid-template-columns:
+      1fr;
+  }
+
+  .cart {
+    position: static;
+  }
+
+}
+
+@media (
+  max-width: 700px
+) {
+
+  .restaurant-hero {
+    padding: 30px;
+
+    flex-direction:
+      column;
+
+    align-items:
+      flex-start;
+  }
+
+  .restaurant-logo {
+    margin-top: 25px;
+  }
+
+  .product-grid {
+    grid-template-columns:
+      1fr;
+  }
+
+}
+.restaurant-hero { background: #19343e; border-radius: 22px; box-shadow: none; }
+.restaurant-logo { width:100px; height:100px; font-size:44px; border-radius:24px; background:#f1b23e; }
+.product-card { border:1px solid #e6e8e4; border-radius:18px; overflow:hidden; box-shadow:0 5px 20px #1d303308; }
+.product-image { aspect-ratio: 4 / 3; height:auto; background:#f2eee5; }
+.product-image img { width:100%; height:100%; object-fit:cover; }
+.image-note { display:block; color:#75817c; font-size:11px; margin-bottom:8px; }
+.product-content h3 { font-size:20px; }
+.product-content button:disabled { opacity:.5; cursor:not-allowed; }

@@ -1,0 +1,44 @@
+# .NET
+bin/
+obj/
+.vs/
+*.user
+*.suo
+
+# Angular / Node
+node_modules/
+dist/
+.angular/
+
+# Visual Studio Code
+.vscode/
+
+# Archivos temporales
+*.log
+*.tmp
+
+# Sistema
+.DS_Store
+Thumbs.db
+
+# Configuración privada y datos locales
+**/appsettings.json
+**/appsettings.*.json
+!**/appsettings.Example.json
+.env
+.env.*
+!.env.example
+**/App_Data/
+respaldos-codex/
+*.bak
+*.bacpac
+*.mdf
+*.ldf
+*.pfx
+*.p12
+*.key
+*.publishsettings
+*.pubxml
+*.pubxml.user
+artifacts/
+backend/**/wwwroot/
