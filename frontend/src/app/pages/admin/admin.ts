@@ -1,3 +1,4 @@
+import { mensajeError } from '../../services/mensajes-error';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -180,6 +181,7 @@ export class Admin implements OnInit {
     .subscribe({
 
       next: respuesta => {
+        this.cdr.markForCheck();
 
         this.dashboard =
           respuesta.dashboard;
@@ -205,6 +207,7 @@ export class Admin implements OnInit {
       },
 
       error: error => {
+        this.cdr.markForCheck();
 
         console.error(
           'Error cargando administración:',
@@ -329,6 +332,7 @@ export class Admin implements OnInit {
       })
     ).subscribe({
       next: ({ respuesta, filas }) => {
+        this.cdr.markForCheck();
         this.serviciosPendientes = respuesta.pendientes ?? [];
         this.motoristasAsignacion = respuesta.motoristas ?? [];
         this.servicios = filas;
@@ -336,6 +340,7 @@ export class Admin implements OnInit {
         this.prepararAsignaciones();
       },
       error: () => {
+        this.cdr.markForCheck();
         this.notificarAsignacion(trasOperacion
           ? 'El cambio se guardó, pero no se pudo actualizar la disponibilidad. Pulsa Actualizar antes de continuar.'
           : 'No se pudieron cargar las asignaciones. Pulsa Actualizar para reintentar.', 'error');
@@ -361,20 +366,18 @@ export class Admin implements OnInit {
       s.idServicio = id;
       const libre = pendientes.has(id);
       if (libre) this.asignacionesConfirmadas.delete(id);
-      const confirmado = this.asignacionesConfirmadas.get(id);
-      const idMotorista = Number(s.idMotorista ?? s.motorista?.idMotorista ?? confirmado?.idMotorista) || null;
-      const nombre = (typeof s.motorista === 'string' ? s.motorista : s.motorista?.nombre) || s.nombreMotorista || motoristas.get(idMotorista!)?.nombre || confirmado?.nombre;
+      const idMotorista = Number(s.idMotorista ?? s.motorista?.idMotorista) || null;
+      const nombre = (typeof s.motorista === 'string' ? s.motorista : s.motorista?.nombre) || s.nombreMotorista || motoristas.get(idMotorista!)?.nombre;
       const finalizado = this.esFinalizado(s);
       const delivery = this.normalizarAsignacion(s.tipoServicio) === 'DELIVERY';
       const modalidad = this.normalizarAsignacion(s.modalidad);
       const recoger = delivery && modalidad === 'RECOGER';
-      // pendientes contiene TODOS los servicios activos sin motorista (contrato del backend).
-      // La ausencia solo prueba asignación cuando conocemos que el servicio sigue activo.
-      const asignado = !libre && (!!idMotorista || !!nombre || s.activo === true);
+      // La asignación se confirma por idMotorista, nunca por ausencia de otra lista.
+      const asignado = !!idMotorista;
       const requiere = !finalizado && !recoger && (!delivery || !!modalidad);
       s.asignacion = {
         idMotorista, asignado,
-        puedeAsignar: requiere && libre,
+        puedeAsignar: requiere && !asignado && libre,
         puedeQuitar: requiere && asignado,
         nombre: nombre || (idMotorista ? `Motorista #${idMotorista}` : 'Motorista asignado (nombre no informado por la API)'),
         etiqueta: finalizado ? 'Finalizado' : recoger ? 'No requiere motorista' : delivery && !modalidad ? 'Modalidad sin confirmar. Pulsa Actualizar.' : !libre && !asignado ? 'Asignación sin confirmar. Pulsa Actualizar.' : ''
@@ -407,6 +410,7 @@ export class Admin implements OnInit {
     this.avisoAsignacion = '';
     this.api.asignarMotoristaServicio(fila.idServicio, Number(motorista.idMotorista), 'Motorista asignado desde Administración General.').subscribe({
       next: respuesta => {
+        this.cdr.markForCheck();
         this.asignacionesConfirmadas.set(fila.idServicio, { idMotorista: Number(motorista.idMotorista), nombre: respuesta?.motorista?.nombre || motorista.nombre });
         fila.idMotorista = Number(motorista.idMotorista);
         fila.nombreMotorista = respuesta?.motorista?.nombre || motorista.nombre;
@@ -418,6 +422,7 @@ export class Admin implements OnInit {
         this.cargarAsignaciones(true);
       },
       error: error => {
+        this.cdr.markForCheck();
         this.notificarAsignacion(error?.error?.mensaje || 'No fue posible asignar el motorista.', 'error');
         this.cargarAsignaciones(true);
       }
@@ -432,17 +437,19 @@ export class Admin implements OnInit {
     this.avisoAsignacion = '';
     this.api.quitarMotoristaServicio(fila.idServicio).subscribe({
       next: () => {
+        this.cdr.markForCheck();
         this.asignacionesConfirmadas.delete(fila.idServicio);
         fila.idMotorista = null;
         fila.motorista = null;
         fila.nombreMotorista = null;
         this.serviciosPendientes.push({ ...fila });
         this.prepararAsignaciones();
-        this.notificarAsignacion(`${fila.codigoRastreo}: motorista retirado correctamente.`, 'success');
+        this.notificarAsignacion(`${fila.codigoRastreo}: motorista retirado. Servicio en control manual; puedes asignar otro motorista.`, 'success');
         // La disponibilidad se toma del servidor antes de permitir otra operación.
         this.cargarAsignaciones(true);
       },
       error: error => {
+        this.cdr.markForCheck();
         this.notificarAsignacion(error?.error?.mensaje || 'No fue posible quitar la asignación.', 'error');
         this.cargarAsignaciones(true);
       }
@@ -536,6 +543,9 @@ export class Admin implements OnInit {
       return;
     }
 
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.usuarioForm.correo.trim())) { this.error='Ingresa un correo válido, por ejemplo nombre@correo.com.'; return; }
+    if(!Number(this.usuarioForm.idRol)) { this.error='Selecciona un rol para el usuario.';return; }
+    if(this.usuarioForm.password && this.usuarioForm.password.length<8) {this.error='La contraseña debe tener al menos 8 caracteres.';return;}
     this.guardando = true;
 
     if (
@@ -571,6 +581,7 @@ export class Admin implements OnInit {
         .subscribe({
 
           next: respuesta => {
+        this.cdr.markForCheck();
 
             this.guardando = false;
 
@@ -582,12 +593,12 @@ export class Admin implements OnInit {
           },
 
           error: error => {
+        this.cdr.markForCheck();
 
             this.guardando = false;
 
             this.error =
-              error?.error?.mensaje ??
-              'No se pudo actualizar el usuario.';
+              mensajeError(error, 'No se pudo actualizar el usuario.');
           }
         });
 
@@ -621,6 +632,7 @@ export class Admin implements OnInit {
       .subscribe({
 
         next: respuesta => {
+        this.cdr.markForCheck();
 
           this.guardando = false;
 
@@ -632,12 +644,12 @@ export class Admin implements OnInit {
         },
 
         error: error => {
+        this.cdr.markForCheck();
 
           this.guardando = false;
 
           this.error =
-            error?.error?.mensaje ??
-            'No se pudo crear el usuario.';
+            mensajeError(error, 'No se pudo crear el usuario.');
         }
       });
   }
@@ -668,6 +680,7 @@ export class Admin implements OnInit {
       .subscribe({
 
         next: respuesta => {
+        this.cdr.markForCheck();
 
           this.mensaje =
             respuesta.mensaje;
@@ -678,10 +691,10 @@ export class Admin implements OnInit {
         },
 
         error: error => {
+        this.cdr.markForCheck();
 
           this.error =
-            error?.error?.mensaje ??
-            'No fue posible cambiar el estado.';
+            mensajeError(error, 'No fue posible cambiar el estado.');
         }
       });
   }
@@ -693,6 +706,7 @@ export class Admin implements OnInit {
       .subscribe({
 
         next: datos => {
+        this.cdr.markForCheck();
 
           this.usuarios =
             datos;
@@ -702,6 +716,7 @@ export class Admin implements OnInit {
             .subscribe({
 
               next: dashboard => {
+        this.cdr.markForCheck();
 
                 this.dashboard =
                   dashboard;
@@ -710,6 +725,7 @@ export class Admin implements OnInit {
         },
 
         error: error => {
+        this.cdr.markForCheck();
 
           console.error(
             error
@@ -729,12 +745,14 @@ export class Admin implements OnInit {
       .subscribe({
 
         next: datos => {
+        this.cdr.markForCheck();
 
           this.restaurantes =
             datos;
         },
 
         error: error => {
+        this.cdr.markForCheck();
 
           console.error(
             'Error restaurantes:',
@@ -742,8 +760,7 @@ export class Admin implements OnInit {
           );
 
           this.error =
-            error?.error?.mensaje ??
-            'No se pudieron cargar los restaurantes.';
+            mensajeError(error, 'No se pudieron cargar los restaurantes.');
         }
       });
   }
@@ -907,6 +924,7 @@ export class Admin implements OnInit {
         .subscribe({
 
           next: respuesta => {
+        this.cdr.markForCheck();
 
             this.guardando = false;
 
@@ -918,12 +936,12 @@ export class Admin implements OnInit {
           },
 
           error: error => {
+        this.cdr.markForCheck();
 
             this.guardando = false;
 
             this.error =
-              error?.error?.mensaje ??
-              'No se pudo actualizar el restaurante.';
+              mensajeError(error, 'No se pudo actualizar el restaurante.');
           }
         });
 
@@ -937,6 +955,7 @@ export class Admin implements OnInit {
       .subscribe({
 
         next: respuesta => {
+        this.cdr.markForCheck();
 
           this.guardando = false;
 
@@ -948,12 +967,12 @@ export class Admin implements OnInit {
         },
 
         error: error => {
+        this.cdr.markForCheck();
 
           this.guardando = false;
 
           this.error =
-            error?.error?.mensaje ??
-            'No se pudo crear el restaurante.';
+            mensajeError(error, 'No se pudo crear el restaurante.');
         }
       });
   }
@@ -970,6 +989,7 @@ export class Admin implements OnInit {
       .subscribe({
 
         next: respuesta => {
+        this.cdr.markForCheck();
 
           this.mensaje =
             respuesta.mensaje;
@@ -980,10 +1000,10 @@ export class Admin implements OnInit {
         },
 
         error: error => {
+        this.cdr.markForCheck();
 
           this.error =
-            error?.error?.mensaje ??
-            'No se pudo cambiar el estado del restaurante.';
+            mensajeError(error, 'No se pudo cambiar el estado del restaurante.');
         }
       });
   }
@@ -1006,6 +1026,7 @@ export class Admin implements OnInit {
     .subscribe({
 
       next: respuesta => {
+        this.cdr.markForCheck();
 
         this.motoristas =
           respuesta.motoristas;
@@ -1015,6 +1036,7 @@ export class Admin implements OnInit {
       },
 
       error: error => {
+        this.cdr.markForCheck();
 
         console.error(
           'Error motoristas:',
@@ -1022,8 +1044,7 @@ export class Admin implements OnInit {
         );
 
         this.error =
-          error?.error?.mensaje ??
-          'No se pudieron cargar los motoristas.';
+          mensajeError(error, 'No se pudieron cargar los motoristas.');
       }
     });
   }
@@ -1049,6 +1070,7 @@ export class Admin implements OnInit {
       .subscribe({
 
         next: datos => {
+        this.cdr.markForCheck();
 
           this.usuariosMotoristasDisponibles =
             datos;
@@ -1134,6 +1156,7 @@ export class Admin implements OnInit {
         .subscribe({
 
           next: respuesta => {
+        this.cdr.markForCheck();
 
             this.guardando = false;
 
@@ -1145,12 +1168,12 @@ export class Admin implements OnInit {
           },
 
           error: error => {
+        this.cdr.markForCheck();
 
             this.guardando = false;
 
             this.error =
-              error?.error?.mensaje ??
-              'No se pudo actualizar el motorista.';
+              mensajeError(error, 'No se pudo actualizar el motorista.');
           }
         });
 
@@ -1180,6 +1203,7 @@ export class Admin implements OnInit {
       .subscribe({
 
         next: respuesta => {
+        this.cdr.markForCheck();
 
           this.guardando = false;
 
@@ -1191,12 +1215,12 @@ export class Admin implements OnInit {
         },
 
         error: error => {
+        this.cdr.markForCheck();
 
           this.guardando = false;
 
           this.error =
-            error?.error?.mensaje ??
-            'No se pudo registrar el motorista.';
+            mensajeError(error, 'No se pudo registrar el motorista.');
         }
       });
   }
@@ -1213,6 +1237,7 @@ export class Admin implements OnInit {
       .subscribe({
 
         next: respuesta => {
+        this.cdr.markForCheck();
 
           this.mensaje =
             respuesta.mensaje;
@@ -1223,10 +1248,10 @@ export class Admin implements OnInit {
         },
 
         error: error => {
+        this.cdr.markForCheck();
 
           this.error =
-            error?.error?.mensaje ??
-            'No se pudo cambiar el estado del motorista.';
+            mensajeError(error, 'No se pudo cambiar el estado del motorista.');
         }
       });
   }
@@ -1243,6 +1268,7 @@ export class Admin implements OnInit {
       .subscribe({
 
         next: respuesta => {
+        this.cdr.markForCheck();
 
           this.mensaje =
             respuesta.mensaje;
@@ -1253,10 +1279,10 @@ export class Admin implements OnInit {
         },
 
         error: error => {
+        this.cdr.markForCheck();
 
           this.error =
-            error?.error?.mensaje ??
-            'No se pudo cambiar la disponibilidad.';
+            mensajeError(error, 'No se pudo cambiar la disponibilidad.');
         }
       });
   }

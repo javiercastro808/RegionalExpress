@@ -12,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 // ============================================================
 
 builder.Services.AddControllers();
+builder.Services.AddHostedService<RegionalExpress.API.Services.AsignadorAutomatico>();
 builder.Services.AddScoped<RegionalExpress.API.Services.ConfirmacionCorreo>();
 
 // ============================================================
@@ -163,6 +164,12 @@ builder.Services.AddSwaggerGen(options =>
 // ============================================================
 
 var app = builder.Build();
+if(args.Contains("--crear-motorista-prueba")) {
+ using var scope=app.Services.CreateScope();
+ await RegionalExpress.API.Services.CrearMotoristaPrueba.Ejecutar(scope.ServiceProvider.GetRequiredService<RegionalExpressContext>());
+ return;
+}
+
 
 if (args.Contains("--inicializar-demo"))
 {

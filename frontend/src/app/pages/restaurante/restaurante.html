@@ -152,17 +152,20 @@
           <!-- PRODUCTOS -->
           <!-- ====================================== -->
 
-          <div class="product-grid">
+          <label for="categoria-menu">Categoría</label>
+<select id="categoria-menu" [(ngModel)]="categoriaSeleccionada" class="form-select mb-3"><option value="">Todas las categorías</option><option *ngFor="let categoria of categorias" [value]="categoria">{{categoria}}</option></select>
+<button type="button" *ngIf="itemsCarrito.length" (click)="carrito.limpiar(); mensajePedido=''" class="btn btn-outline-secondary mb-3">Vaciar carrito</button>
+<div class="product-grid">
 
             <article
-              *ngFor="let producto of productos"
+              *ngFor="let producto of productosVisibles"
               class="product-card">
 
               <div class="product-image">
 
                 <img
                   *ngIf="producto.imagen"
-                  [src]="producto.imagen"
+                  [src]="producto.imagen" loading="lazy" decoding="async"
                   [alt]="producto.nombre + ' — ' + producto.descripcion" loading="lazy" decoding="async" (error)="producto.imagen = null">
 
 
@@ -222,7 +225,7 @@
                   <button
                     type="button"
                     class="btn-add"
-                    [disabled]="producto.disponible === false" (click)="agregar(producto)">
+                    [disabled]="!puedeComprar || producto.disponible === false" (click)="agregar(producto)">
 
                     + Agregar
 
@@ -244,6 +247,7 @@
         <!-- ====================================== -->
 
         <aside class="cart">
+          <p *ngIf="!puedeComprar" role="status">Estás usando una cuenta de gestión. Para hacer pedidos utiliza una cuenta de cliente.</p>
 
           <div class="cart-header">
 
@@ -587,6 +591,10 @@
                   portón o referencia
                 ">
               </textarea>
+<h3>Ubicación de entrega (obligatoria)</h3>
+@defer (on immediate) { <app-mapa-ubicacion (puntoChange)="ubicar($event)" /> } @placeholder { <p>Preparando mapa…</p> }
+<p *ngIf="!puntoEntrega" role="status">Permite la ubicación o selecciona el punto en el mapa para confirmar el pedido.</p>
+
 
             </div>
 
@@ -750,8 +758,8 @@
             <button
               type="button"
               class="checkout-btn"
-              [disabled]="procesandoPedido"
-              (click)="confirmarPedido()">
+              [disabled]="!puedeComprar || procesandoPedido || !itemsCarrito.length || (modalidadEntrega === 'DOMICILIO' && !puntoEntrega)"
+              [attr.aria-disabled]="!puedeComprar" (click)="confirmarPedido()">
 
 
               <span

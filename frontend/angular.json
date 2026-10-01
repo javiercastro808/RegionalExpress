@@ -3,7 +3,7 @@
   "version": 1,
   "cli": {
     "packageManager": "npm",
-    "analytics": "8ffc8eae-c323-423d-ab33-5fbb836bbff9"
+    "analytics": false
   },
   "newProjectRoot": "projects",
   "projects": {
@@ -87,7 +87,9 @@
             "compartido": {
               "buildTarget": "regional-express-web:build:compartido",
               "proxyConfig": "proxy.pruebas.json",
-              "allowedHosts": [".devtunnels.ms"]
+              "allowedHosts": [
+                ".devtunnels.ms"
+              ]
             }
           },
           "defaultConfiguration": "development"

@@ -1,9 +1,7 @@
-import { API_URL } from './api-url';
-import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { tap } from 'rxjs/operators';
-
+import { Injectable, InjectionToken, inject } from "@angular/core";
+import { HttpClient } from "@angular/common/http";
+import { BehaviorSubject, tap } from "rxjs";
+import { config } from "./config";
 export interface UsuarioSesion {
   idUsuario: number;
   nombre: string;
@@ -11,155 +9,74 @@ export interface UsuarioSesion {
   idRol: number;
   rol: string;
 }
-
 export interface LoginRespuesta {
   mensaje: string;
   token: string;
   usuario: UsuarioSesion;
 }
-
-@Injectable({
-  providedIn: 'root'
-})
+export const SESSION_STORAGE = new InjectionToken<Storage>("Session storage", {
+  providedIn: "root",
+  factory: () => sessionStorage,
+});
+@Injectable({ providedIn: "root" })
 export class Auth {
-
-  private readonly apiUrl =
-    API_URL + '/Auth';
-
-  private readonly tokenKey =
-    'regionalExpressToken';
-
-  private readonly usuarioKey =
-    'regionalExpressUsuario';
-
-  private usuarioSubject =
-    new BehaviorSubject<UsuarioSesion | null>(
-      this.cargarUsuario()
-    );
-
-  usuario$ =
-    this.usuarioSubject.asObservable();
-
-  constructor(
-    private http: HttpClient
-  ) {}
-
-
-  login(
-    correo: string,
-    password: string
-  ): Observable<LoginRespuesta> {
-
-    return this.http.post<LoginRespuesta>(
-      `${this.apiUrl}/login`,
-      {
-        correo,
-        password
-      }
-    )
-    .pipe(
-      tap(respuesta => {
-
-        localStorage.setItem(
-          this.tokenKey,
-          respuesta.token
-        );
-
-        localStorage.setItem(
-          this.usuarioKey,
-          JSON.stringify(
-            respuesta.usuario
-          )
-        );
-
-        this.usuarioSubject.next(
-          respuesta.usuario
-        );
-
-      })
-    );
+  private http = inject(HttpClient);
+  private storage = inject(SESSION_STORAGE);
+  private readonly key = "regionalExpress.sesion.v2";
+  private sesion: LoginRespuesta | null = this.cargar();
+  private usuarioSubject = new BehaviorSubject<UsuarioSesion | null>(
+    this.sesion?.usuario ?? null,
+  );
+  usuario$ = this.usuarioSubject.asObservable();
+  login(correo: string, password: string) {
+    return this.http
+      .post<LoginRespuesta>(config.apiUrl + "/Auth/login", { correo, password })
+      .pipe(
+        tap((r) => {
+          if (!r.token || !r.usuario || !this.vigente(r.token))
+            throw new Error("Respuesta de sesión inválida.");
+          this.storage.setItem(this.key, JSON.stringify(r));
+          this.sesion = r;
+          this.usuarioSubject.next(r.usuario);
+        }),
+      );
   }
-
-
-  logout(): void {
-
-    localStorage.removeItem(
-      this.tokenKey
-    );
-
-    localStorage.removeItem(
-      this.usuarioKey
-    );
-
-    this.usuarioSubject.next(
-      null
-    );
+  logout() {
+    this.sesion = null;
+    try {
+      this.storage.removeItem(this.key);
+    } catch {}
+    this.usuarioSubject.next(null);
   }
-
-
   getToken(): string | null {
-
-    return localStorage.getItem(
-      this.tokenKey
-    );
+    if (this.sesion && !this.vigente(this.sesion.token)) this.logout();
+    return this.sesion?.token ?? null;
   }
-
-
-  getUsuario(): UsuarioSesion | null {
-
-    return this.usuarioSubject.value;
+  getUsuario() {
+    this.getToken();
+    return this.sesion?.usuario ?? null;
   }
-
-
-  estaAutenticado(): boolean {
-
-    return this.tokenVigente() && !!this.getUsuario();
+  estaAutenticado() {
+    return !!this.getToken() && !!this.sesion?.usuario;
   }
-
-
-  tieneRol(rol: string): boolean {
-
-    return (
-      this.getUsuario()?.rol === rol
-    );
+  tieneRol(rol: string) {
+    return this.getUsuario()?.rol?.trim().toUpperCase() === rol.toUpperCase();
   }
-
-
-  private tokenVigente(): boolean {
+  private vigente(token: string) {
     try {
-      const token = this.getToken();
-      if (!token) return false;
-      const payload = JSON.parse(atob(token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')));
-      return typeof payload.exp === 'number' && payload.exp * 1000 > Date.now();
-    } catch { return false; }
+      const parte = token.split(".")[1].replace(/-/g, "+").replace(/_/g, "/");
+      const datos = JSON.parse(atob(parte));
+      return Number.isFinite(datos.exp) && datos.exp * 1000 > Date.now();
+    } catch {
+      return false;
+    }
   }
-
-  private cargarUsuario():
-    UsuarioSesion | null {
-
-    const usuario =
-      localStorage.getItem(
-        this.usuarioKey
-      );
-
-    if (!usuario || !this.tokenVigente()) {
-      return null;
-    }
-
+  private cargar(): LoginRespuesta | null {
     try {
-
-      return JSON.parse(
-        usuario
-      ) as UsuarioSesion;
-
-    }
-    catch {
-
-      localStorage.removeItem(
-        this.usuarioKey
-      );
-
-      return null;
-    }
+      const r = JSON.parse(this.storage.getItem(this.key) || "null");
+      if (r?.usuario?.idUsuario && this.vigente(r.token)) return r;
+      this.storage.removeItem(this.key);
+    } catch {}
+    return null;
   }
 }

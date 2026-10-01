@@ -545,9 +545,7 @@ th {
 
   z-index: 100000 !important;
 
-  box-shadow:
-    0 25px 60px
-    rgba(0, 0, 0, 0.35) !important;
+  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.35) !important;
 }
 
 .modal-header {
@@ -726,14 +724,11 @@ th {
     padding: 20px !important;
   }
 }
-.ubicacion-panel { padding: 18px; margin-bottom: 20px; background: #edf6f2; border: 1px solid #c8e2d7; border-radius: 14px; }
-.ubicacion-panel button, .ubicacion-panel a { display:inline-block; margin:4px; text-decoration:none; color:#173c32; }
 
-/* La barra lateral comienza bajo la navegación principal y no la tapa. */
-.layout { align-items: flex-start; }
-.layout .sidebar { position: sticky; top: 0; bottom: auto; flex: 0 0 260px; height: 100vh; }
-.layout .contenido { margin-left: 0; width: calc(100% - 260px); min-width: 0; }
-@media (max-width: 760px) {
-  .layout .sidebar { flex-basis: 80px; }
-  .layout .contenido { width: calc(100% - 80px); }
-}
+.pasos-entrega{list-style:none;padding:0;display:grid;gap:8px}.pasos-entrega li{padding:10px 14px;border-radius:10px;background:#f1f5f9;color:#475569}.pasos-entrega .completado{background:#e8f7ee;color:#166534}.pasos-entrega [aria-current="step"]{font-weight:700;border:1px solid #16804a}
+
+button.stat{font:inherit;text-align:left;cursor:pointer;color:inherit;width:100%}
+button.stat:hover,button.stat:focus-visible{outline:2px solid #16804a;outline-offset:3px}
+.timeline-content{min-width:0;flex:1}.timeline-top{display:flex;flex-wrap:wrap;gap:8px;align-items:flex-start}
+.timeline-top strong{min-width:0;overflow-wrap:anywhere;flex:1 1 180px}.timeline-top span{white-space:normal;flex:0 1 auto}
+@media(max-width:600px){.timeline-top{flex-direction:column}.timeline-top strong{flex-basis:auto}.titulo-seccion{flex-wrap:wrap;gap:12px}}

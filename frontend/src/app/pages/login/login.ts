@@ -42,7 +42,7 @@ export class Login {
   iniciarSesion(): void {
 
     if (this.cargando) return;
-    this.error = ''; 
+    this.error = '';
 
     if (
       !this.correo.trim() ||

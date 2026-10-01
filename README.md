@@ -32,11 +32,13 @@ El motorista debe permitir la ubicación y mantener abierta su página. Para geo
 
 ## GitHub y alojamiento
 
-Nombre propuesto del repositorio privado: `proyecto-grupal-regional-express`.
+Repositorio de trabajo: `RegionalExpress`.
 Las configuraciones privadas, correos locales, dependencias y respaldos están excluidos mediante `.gitignore`.
 
-Repositorio: https://github.com/javiercastro808/proyecto-grupal-regional-express
+Repositorio: https://github.com/javiercastro808/RegionalExpress
 
 Para preparar los archivos publicables ejecutar `./scripts/Preparar-Publicacion.ps1` desde PowerShell. El resultado es un ZIP en `artifacts/`, con Angular y API juntos y sin configuraciones privadas. Para subir el código ejecutar `./scripts/Subir-GitHub.ps1`.
 
 Consultar [el plan de publicación](docs/PUBLICACION.md), que distingue lo implementado de las verificaciones y accesos pendientes.
+
+Estado de funciones y pendientes: [alcance y estado](docs/ALCANCE_Y_ESTADO.md).

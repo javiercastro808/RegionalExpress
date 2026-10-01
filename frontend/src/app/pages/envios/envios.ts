@@ -1,3 +1,4 @@
+import { MapaUbicacion, PuntoEntrega } from '../../components/mapa-ubicacion/mapa-ubicacion';
 import { ChangeDetectorRef } from '@angular/core';
 import { finalize } from 'rxjs';
 import { Auth } from "../../services/auth";
@@ -30,7 +31,7 @@ import {
   imports: [
     CommonModule,
     FormsModule,
-    RouterLink
+    RouterLink, MapaUbicacion
   ],
 
   templateUrl:
@@ -40,6 +41,8 @@ import {
     './envios.scss'
 })
 export class Envios {
+  puntoOrigen:PuntoEntrega|null=null;
+  puntoDestino:PuntoEntrega|null=null;
 
   // ==========================================
   // REMITENTE
@@ -112,7 +115,7 @@ export class Envios {
   envioConfirmado = false;
 
   codigoRastreo = '';
-  correoConfirmacion = ''; 
+  correoConfirmacion = '';
 
   mensaje = '';
 
@@ -336,6 +339,7 @@ export class Envios {
   // ==========================================
 
   confirmarEnvio(): void {
+    if(!this.puntoOrigen||!this.puntoDestino){this.error='Marca en el mapa el punto de recogida y el punto de entrega.';return;}
     if (this.procesando) return;
     if (!this.auth.estaAutenticado() || !this.auth.tieneRol("CLIENTE")) { this.error = "Inicia sesión con una cuenta de cliente para confirmar tu envío."; return; }
 
@@ -364,6 +368,8 @@ export class Envios {
 
 
     const envio = {
+      latitudOrigen:this.puntoOrigen.latitud,longitudOrigen:this.puntoOrigen.longitud,
+      latitudDestino:this.puntoDestino.latitud,longitudDestino:this.puntoDestino.longitud,
 
       idCliente: this.auth.getUsuario()!.idUsuario,
 
@@ -454,12 +460,6 @@ export class Envios {
     };
 
 
-    console.log(
-      'Envío enviado:',
-      envio
-    );
-
-
     this.procesando = true;
 
 
@@ -469,11 +469,6 @@ export class Envios {
       .subscribe({
 
         next: respuesta => {
-
-          console.log(
-            'Envío registrado:',
-            respuesta
-          );
 
 
           this.procesando =
@@ -539,6 +534,7 @@ export class Envios {
   // ==========================================
 
   nuevoEnvio(): void {
+    this.puntoOrigen=null;this.puntoDestino=null;
 
     this.nombreRemitente = '';
 

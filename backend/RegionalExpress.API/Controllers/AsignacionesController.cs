@@ -79,7 +79,7 @@ namespace RegionalExpress.API.Controllers
                 await _context.Servicios
                     .Where(x =>
                         x.IdMotorista == null &&
-                        x.Activo)
+                        x.Activo && x.FechaFinalizacion == null && (x.Pedido == null || x.Pedido.ModalidadEntrega != "RECOGER"))
                     .OrderByDescending(x =>
                         x.FechaCreacion)
                     .Select(x => new
@@ -362,6 +362,7 @@ namespace RegionalExpress.API.Controllers
                     x.IdMotorista == motorista.IdMotorista && x.IdServicio != idServicio && x.Activo && x.FechaFinalizacion == null);
             }
 
+            _context.HistorialEstados.Add(new HistorialEstado { IdServicio = servicio.IdServicio, IdEstado = servicio.IdEstadoActual, IdUsuario = ObtenerIdUsuario(), FechaHora = DateTime.Now, Observacion = RegionalExpress.API.Services.AsignadorAutomatico.RetiroManual });
             servicio.IdMotorista =
                 null;
 

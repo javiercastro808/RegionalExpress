@@ -1,40 +1,24 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using RegionalExpress.API.Models;
-
 namespace RegionalExpress.API.Controllers;
-
 [Route("api/[controller]")]
 [ApiController]
-public class ProductosController : ControllerBase
+public class ProductosController(RegionalExpressContext context) : ControllerBase
 {
-    private readonly RegionalExpressContext _context;
-
-    public ProductosController(RegionalExpressContext context)
-    {
-        _context = context;
-    }
-
     [HttpGet]
-    public async Task<IActionResult> GetProductos()
+    public async Task<IActionResult> GetProductos([FromQuery] int? idRestaurante)
     {
-        var productos = await _context.Productos
-            .Where(p => p.Activo == true)
-            .ToListAsync();
-
-        return Ok(productos);
+        if (idRestaurante is <= 0) return BadRequest(new { mensaje = "Restaurante inválido." });
+        var consulta = context.Productos.AsNoTracking().Where(p => p.Activo && p.IdCategoriaNavigation.Activo && p.IdCategoriaNavigation.IdRestauranteNavigation.Activo);
+        if (idRestaurante.HasValue) consulta = consulta.Where(p => p.IdCategoriaNavigation.IdRestaurante == idRestaurante.Value);
+        return Ok(await consulta.OrderBy(p => p.IdCategoriaNavigation.Nombre).ThenBy(p => p.Nombre).Select(p => new {
+            p.IdProducto, p.IdCategoria, idRestaurante = p.IdCategoriaNavigation.IdRestaurante,
+            categoria = p.IdCategoriaNavigation.Nombre, p.Nombre, p.Descripcion, p.Precio, p.Imagen, p.Disponible, p.Activo
+        }).ToListAsync());
     }
-
-    [HttpGet("categoria/{idCategoria}")]
-    public async Task<IActionResult> GetProductosPorCategoria(int idCategoria)
-    {
-        var productos = await _context.Productos
-            .Where(p =>
-                p.IdCategoria == idCategoria &&
-                p.Activo == true &&
-                p.Disponible == true)
-            .ToListAsync();
-
-        return Ok(productos);
-    }
+    [HttpGet("categoria/{idCategoria:int}")]
+    public async Task<IActionResult> GetProductosPorCategoria(int idCategoria) => Ok(await context.Productos.AsNoTracking()
+        .Where(p => p.IdCategoria == idCategoria && p.Activo && p.Disponible && p.IdCategoriaNavigation.Activo && p.IdCategoriaNavigation.IdRestauranteNavigation.Activo)
+        .Select(p => new {p.IdProducto,p.IdCategoria,idRestaurante=p.IdCategoriaNavigation.IdRestaurante,categoria=p.IdCategoriaNavigation.Nombre,p.Nombre,p.Descripcion,p.Precio,p.Imagen,p.Disponible}).ToListAsync());
 }

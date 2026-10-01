@@ -39,6 +39,7 @@ export class Api {
   // CLIENTE - PRODUCTOS
   // ==========================================================
 
+  getProductosRestaurante(id:number):Observable<any[]>{return this.http.get<any[]>(this.apiUrl+'/Productos',{params:{idRestaurante:id}});}
   getProductos(): Observable<any[]> {
 
     return this.http.get<any[]>(

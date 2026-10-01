@@ -212,6 +212,9 @@ namespace RegionalExpress.API.Controllers
             }
 
 
+            if (request.Password.Length < 8) return BadRequest(new { mensaje = "La contraseña debe tener al menos 8 caracteres." });
+            if (nombre.Length > 100 || correo.Length > 150) return BadRequest(new { mensaje = "Nombre: máximo 100 caracteres. Correo: máximo 150 caracteres." });
+            if (!System.Net.Mail.MailAddress.TryCreate(correo, out var direccionCorreo) || direccionCorreo.Address != correo) return BadRequest(new { mensaje = "Ingrese un correo válido." });
             var existe =
                 await _context.Usuarios
                     .AnyAsync(
@@ -255,6 +258,8 @@ namespace RegionalExpress.API.Controllers
                 {
                     Nombre =
                         nombre,
+                    Apellido = "",
+                    FechaRegistro = DateTime.Now,
 
                     Correo =
                         correo,
@@ -348,6 +353,9 @@ namespace RegionalExpress.API.Controllers
             }
 
 
+            if (request.Password != null && request.Password.Length > 0 && (string.IsNullOrWhiteSpace(request.Password) || request.Password.Length < 8)) return BadRequest(new { mensaje = "La contraseña debe tener al menos 8 caracteres." });
+            if (nombre.Length > 100 || correo.Length > 150) return BadRequest(new { mensaje = "Nombre: máximo 100 caracteres. Correo: máximo 150 caracteres." });
+            if (!System.Net.Mail.MailAddress.TryCreate(correo, out var direccionCorreo) || direccionCorreo.Address != correo) return BadRequest(new { mensaje = "Ingrese un correo válido." });
             var correoExiste =
                 await _context.Usuarios
                     .AnyAsync(

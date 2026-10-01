@@ -144,11 +144,12 @@
       <p role="status" *ngIf="ultimaActualizacion">Última actualización: {{ ultimaActualizacion | date:'HH:mm:ss' }}. {{ resultado.activo === false ? 'Servicio finalizado.' : 'Se actualiza cada 15 segundos.' }}</p>
       <p role="status" *ngIf="avisoActualizacion">{{ avisoActualizacion }}</p>
       <section *ngIf="resultado.activo !== false && resultado.modalidad !== 'RECOGER'" class="tracking-map">
-        <h3>Ubicación del motorista</h3>
-        <app-mapa-rastreo *ngIf="ubicacion?.disponible" [ubicacion]="ubicacion"></app-mapa-rastreo>
+        <h3>Mapa del servicio</h3>
+        <p *ngIf="ubicacion?.mensaje">{{ubicacion.mensaje}}</p>
+        <app-mapa-rastreo *ngIf="ubicacion?.disponible || ubicacion?.origen || ubicacion?.destino" [ubicacion]="ubicacion"></app-mapa-rastreo>
         <p *ngIf="ubicacion?.disponible">Posición recibida: {{ ubicacion.fechaHora | date:'dd/MM/yyyy HH:mm:ss' }}. <strong *ngIf="!ubicacion.reciente">Ubicación antigua; el motorista puede haber dejado de compartir.</strong></p>
         <p *ngIf="ubicacion?.mensaje" role="status">{{ ubicacion.mensaje }}</p>
-        <p *ngIf="!ubicacion?.disponible && !ubicacion?.mensaje">El motorista aún no ha compartido su ubicación. Debe abrir este servicio en su panel y pulsar «Compartir ubicación». El mapa aparecerá automáticamente al recibir la primera posición.</p>
+        <p *ngIf="!ubicacion?.disponible && !ubicacion?.mensaje">El motorista aún no ha compartido su ubicación. Debe abrir este servicio en su panel y pulsar «Compartir ubicación». El punto rojo indica el destino del cliente; el motorista aparecerá en verde al recibir su posición.</p>
       </section>
       <div class="result-header">
 

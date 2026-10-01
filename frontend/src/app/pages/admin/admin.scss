@@ -1622,3 +1622,16 @@ td {
 .map-link { display: inline-flex; text-decoration: none; align-items: center; background: #e3f1ee; color: #16614e; white-space: nowrap; }
 .actions { flex-wrap: wrap; gap: 8px; }
 .form-card { box-shadow: 0 8px 26px #1c35450a; }
+
+/* Asegura contraste frente a los estilos globales de Bootstrap. */
+.badge{color:#243746;background:#e8eef3;white-space:normal;line-height:1.4}
+.badge.green,.badge.success{color:#14532d;background:#dcfce7}
+.badge.red,.badge.danger{color:#991b1b;background:#fee2e2}
+.badge.orange{color:#78350f;background:#fef3c7}
+.badge.blue{color:#1e3a8a;background:#dbeafe}
+.field input,.field select,.field textarea{color:#182d3d;background:#fff;color-scheme:light;max-width:100%}
+.field select option{color:#182d3d;background:#fff}
+.table-subtitle{display:block;white-space:normal;overflow-wrap:anywhere;max-width:32ch;margin-top:5px}
+.table-responsive td{overflow-wrap:anywhere;vertical-align:top}
+.error-formulario{color:#991b1b;background:#fee2e2;padding:12px;border-radius:8px}
+.field small{display:block;color:#475569;margin-top:6px;line-height:1.5}

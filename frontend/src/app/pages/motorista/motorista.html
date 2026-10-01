@@ -1,11 +1,9 @@
 <div class="layout">
-
   <!-- ===================================================== -->
   <!-- SIDEBAR -->
   <!-- ===================================================== -->
 
   <aside class="sidebar">
-
     <div class="brand">
       <div class="brand-icon">🚚</div>
 
@@ -16,11 +14,11 @@
     </div>
 
     <nav class="menu">
-
       <button
         type="button"
         [class.activo]="seccion === 'inicio'"
-        (click)="cambiarSeccion('inicio')">
+        (click)="cambiarSeccion('inicio')"
+      >
         <span>⌂</span>
         Inicio
       </button>
@@ -28,7 +26,8 @@
       <button
         type="button"
         [class.activo]="seccion === 'servicios'"
-        (click)="cambiarSeccion('servicios')">
+        (click)="cambiarSeccion('servicios')"
+      >
         <span>🚚</span>
         Servicios
       </button>
@@ -36,15 +35,15 @@
       <button
         type="button"
         [class.activo]="seccion === 'delivery'"
-        (click)="cambiarSeccion('delivery')">
-        <span>🍔</span>
-        Delivery
-      </button>
+        (click)="cambiarSeccion('delivery')"
+      >
+        <span>🍔</span>Entregas de comida</button>
 
       <button
         type="button"
         [class.activo]="seccion === 'envios'"
-        (click)="cambiarSeccion('envios')">
+        (click)="cambiarSeccion('envios')"
+      >
         <span>📦</span>
         Envíos
       </button>
@@ -52,33 +51,25 @@
       <button
         type="button"
         [class.activo]="seccion === 'historial'"
-        (click)="cambiarSeccion('historial')">
+        (click)="cambiarSeccion('historial')"
+      >
         <span>▤</span>
         Historial
       </button>
-
     </nav>
 
     <div class="usuario-sidebar">
-
-      <div class="mini-avatar">
-        {{ usuario?.nombre?.charAt(0) }}
-      </div>
+      <div class="mini-avatar">{{ usuario?.nombre?.charAt(0) }}</div>
 
       <div class="usuario-info">
         <strong>{{ usuario?.nombre }}</strong>
         <span>MOTORISTA</span>
       </div>
 
-      <button
-        type="button"
-        class="btn-salir"
-        (click)="cerrarSesion()">
+      <button type="button" class="btn-salir" (click)="cerrarSesion()">
         Cerrar sesión
       </button>
-
     </div>
-
   </aside>
 
   <!-- ===================================================== -->
@@ -86,100 +77,73 @@
   <!-- ===================================================== -->
 
   <main class="contenido">
-
-    <div *ngIf="compartiendoServicio !== null" class="alert alert-success" role="status">
-      Compartiendo ubicación del servicio #{{ compartiendoServicio }}.
-      <button type="button" (click)="detenerUbicacion()">Dejar de compartir</button>
+<p *ngIf="avisoServicios" class="alert alert-info" role="status">{{avisoServicios}} <button type="button" (click)="avisoServicios=''">Entendido</button></p>
+    <div
+      *ngIf="compartiendoServicio !== null"
+      class="alert alert-info"
+      role="status"
+    >
+      Seguimiento del servicio #{{ compartiendoServicio }}.
+      <button type="button" (click)="detenerUbicacion()">
+        Dejar de compartir
+      </button>
       <p>{{ mensajeUbicacion }}</p>
     </div>
     <header class="header">
-
       <div>
         <span class="eyebrow">REGIONAL EXPRESS</span>
         <h1>Panel del Motorista</h1>
       </div>
 
       <div class="perfil">
-
-        <div class="avatar">
-          {{ usuario?.nombre?.charAt(0) }}
-        </div>
+        <div class="avatar">{{ usuario?.nombre?.charAt(0) }}</div>
 
         <div>
           <strong>{{ usuario?.nombre }}</strong>
           <span>{{ usuario?.correo }}</span>
         </div>
-
       </div>
-
     </header>
 
     <!-- ===================================================== -->
     <!-- MENSAJES -->
     <!-- ===================================================== -->
 
-    <div
-      *ngIf="error"
-      class="alert alert-error">
-      {{ error }}
-    </div>
+    <div *ngIf="error" class="alert alert-error">{{ error }}</div>
 
-    <div
-      *ngIf="mensaje"
-      class="alert alert-success">
-      {{ mensaje }}
-    </div>
+    <div *ngIf="mensaje" class="alert alert-success">{{ mensaje }}</div>
 
-    <div
-      *ngIf="cargando"
-      class="cargando">
-
+    <div *ngIf="cargando" class="cargando">
       <div class="spinner"></div>
 
       <p>Cargando información del motorista...</p>
-
     </div>
 
     <!-- ===================================================== -->
     <!-- INICIO -->
     <!-- ===================================================== -->
 
-    <section
-      *ngIf="!cargando && seccion === 'inicio'">
-
+    <section *ngIf="!cargando && seccion === 'inicio'">
       <div class="bienvenida">
-
         <div>
           <span class="eyebrow">BIENVENIDO</span>
 
-          <h2>
-            Hola,
-            {{
-              dashboard?.motorista?.nombre ||
-              usuario?.nombre
-            }}
-          </h2>
+          <h2>Hola, {{ dashboard?.motorista?.nombre || usuario?.nombre }}</h2>
 
           <p>
-            Desde este panel puedes consultar tus servicios
-            asignados y actualizar el estado de cada entrega.
+            Desde este panel puedes consultar tus servicios asignados y
+            actualizar el estado de cada entrega.
           </p>
         </div>
 
         <div
           class="estado-disponibilidad"
-          [class.disponible]="dashboard?.motorista?.disponible">
-
+          [class.disponible]="dashboard?.motorista?.disponible"
+        >
           <span class="punto"></span>
 
-          {{
-            dashboard?.motorista?.disponible
-              ? 'Disponible'
-              : 'En servicio'
-          }}
-
+          {{ dashboard?.motorista?.disponible ? 'Disponible' : 'En servicio' }}
         </div>
-
       </div>
 
       <!-- =================================================== -->
@@ -187,71 +151,47 @@
       <!-- =================================================== -->
 
       <div class="estadisticas">
-
-        <article class="stat">
-
+        <button type="button" class="stat" (click)="verResumen('servicios')">
           <span class="stat-icon">🚚</span>
 
           <div>
             <strong>
-              {{
-                dashboard?.estadisticas?.totalServicios || 0
-              }}
+              {{ dashboard?.estadisticas?.totalServicios || 0 }}
             </strong>
 
             <span>Servicios totales</span>
           </div>
+        </button>
 
-        </article>
-
-        <article class="stat">
-
+        <button type="button" class="stat" (click)="verResumen('servicios', true)">
           <span class="stat-icon">⚡</span>
 
           <div>
-            <strong>
-              {{
-                dashboard?.estadisticas?.activos || 0
-              }}
-            </strong>
+            <strong> {{ dashboard?.estadisticas?.activos || 0 }} </strong>
 
             <span>Servicios activos</span>
           </div>
+        </button>
 
-        </article>
-
-        <article class="stat">
-
+        <button type="button" class="stat" (click)="verResumen('delivery')">
           <span class="stat-icon">🍔</span>
 
           <div>
-            <strong>
-              {{
-                dashboard?.estadisticas?.delivery || 0
-              }}
-            </strong>
+            <strong> {{ dashboard?.estadisticas?.delivery || 0 }} </strong>
 
-            <span>Delivery</span>
+            <span>Entregas de comida</span>
           </div>
+        </button>
 
-        </article>
-
-        <article class="stat">
-
+        <button type="button" class="stat" (click)="verResumen('envios')">
           <span class="stat-icon">📦</span>
 
           <div>
-            <strong>
-              {{
-                dashboard?.estadisticas?.envios || 0
-              }}
-            </strong>
+            <strong> {{ dashboard?.estadisticas?.envios || 0 }} </strong>
 
             <span>Envíos</span>
           </div>
-
-        </article>
-
+        </button>
       </div>
 
       <!-- =================================================== -->
@@ -259,9 +199,7 @@
       <!-- =================================================== -->
 
       <div class="panel">
-
         <div class="panel-header">
-
           <div>
             <span class="eyebrow">TRABAJO ACTUAL</span>
             <h3>Servicios activos</h3>
@@ -270,49 +208,33 @@
           <button
             type="button"
             class="btn-secundario"
-            (click)="cambiarSeccion('servicios')">
+            (click)="cambiarSeccion('servicios')"
+          >
             Ver todos
           </button>
-
         </div>
 
-        <div
-          *ngIf="serviciosActivos.length === 0"
-          class="vacio">
-
+        <div *ngIf="serviciosActivos.length === 0" class="vacio">
           No tienes servicios activos asignados.
-
         </div>
 
         <div class="servicios-grid">
-
           <article
             *ngFor="let servicio of serviciosActivos"
-            class="servicio-card">
-
+            class="servicio-card"
+          >
             <div class="servicio-top">
-
               <span
                 class="tipo"
-                [class.envio]="servicio.tipoServicio === 'ENVIO'">
-
-                {{
-                  tipoServicioTexto(
-                    servicio.tipoServicio
-                  )
-                }}
-
+                [class.envio]="servicio.tipoServicio === 'ENVIO'"
+              >
+                {{ tipoServicioTexto( servicio.tipoServicio ) }}
               </span>
 
-              <span class="estado">
-                {{ servicio.estado }}
-              </span>
-
+              <span class="estado"> {{ servicio.estado }} </span>
             </div>
 
-            <h4>
-              {{ servicio.codigoRastreo }}
-            </h4>
+            <h4>{{ servicio.codigoRastreo }}</h4>
 
             <p>
               <strong>Cliente:</strong>
@@ -322,35 +244,19 @@
             <p>
               <strong>Destino:</strong>
 
-              {{
-                servicio.destino ||
-                'Pendiente'
-              }}
+              {{ servicio.destino || 'Pendiente' }}
             </p>
 
             <div class="servicio-footer">
+              <strong> Q {{ servicio.total | number:'1.2-2' }} </strong>
 
-              <strong>
-                Q {{
-                  servicio.total |
-                  number:'1.2-2'
-                }}
-              </strong>
-
-              <button
-                type="button"
-                (click)="verServicio(servicio)">
+              <button type="button" (click)="verServicio(servicio)">
                 Ver servicio
               </button>
-
             </div>
-
           </article>
-
         </div>
-
       </div>
-
     </section>
 
     <!-- ===================================================== -->
@@ -365,58 +271,25 @@
           seccion === 'delivery' ||
           seccion === 'envios'
         )
-      ">
-
+      "
+    >
       <div class="titulo-seccion">
-
         <div>
+          <span class="eyebrow"> SERVICIOS ASIGNADOS </span>
 
-          <span class="eyebrow">
-            SERVICIOS ASIGNADOS
-          </span>
-
-          <h2>
-
-            <ng-container
-              *ngIf="seccion === 'servicios'">
-              Todos mis servicios
-            </ng-container>
-
-            <ng-container
-              *ngIf="seccion === 'delivery'">
-              Mis Delivery
-            </ng-container>
-
-            <ng-container
-              *ngIf="seccion === 'envios'">
-              Mis Envíos
-            </ng-container>
-
-          </h2>
-
+          <h2>{{ tituloServicios }}</h2>
         </div>
 
-        <span class="contador">
-          {{ serviciosVista.length }} servicios
-        </span>
-
+        <span class="contador"> {{ serviciosVista.length }} servicios </span>
       </div>
 
-      <div
-        *ngIf="serviciosVista.length === 0"
-        class="vacio">
-
+      <div *ngIf="serviciosVista.length === 0" class="vacio">
         No hay servicios para mostrar.
-
       </div>
 
       <div class="tabla-contenedor">
-
-        <table
-          *ngIf="serviciosVista.length > 0">
-
+        <table *ngIf="serviciosVista.length > 0">
           <thead>
-
             <tr>
               <th>Código</th>
               <th>Tipo</th>
@@ -426,79 +299,46 @@
               <th>Total</th>
               <th>Acción</th>
             </tr>
-
           </thead>
 
           <tbody>
-
-            <tr
-              *ngFor="let servicio of serviciosVista">
-
+            <tr *ngFor="let servicio of serviciosVista">
               <td>
-                <strong>
-                  {{ servicio.codigoRastreo }}
-                </strong>
+                <strong> {{ servicio.codigoRastreo }} </strong>
               </td>
 
               <td>
-
                 <span
                   class="tipo"
-                  [class.envio]="servicio.tipoServicio === 'ENVIO'">
-
-                  {{
-                    tipoServicioTexto(
-                      servicio.tipoServicio
-                    )
-                  }}
-
-                </span>
-
-              </td>
-
-              <td>
-                {{ servicio.cliente }}
-              </td>
-
-              <td>
-                {{
-                  servicio.destino ||
-                  'Sin dirección'
-                }}
-              </td>
-
-              <td>
-                <span class="estado">
-                  {{ servicio.estado }}
+                  [class.envio]="servicio.tipoServicio === 'ENVIO'"
+                >
+                  {{ tipoServicioTexto( servicio.tipoServicio ) }}
                 </span>
               </td>
 
+              <td>{{ servicio.cliente }}</td>
+
+              <td>{{ servicio.destino || 'Sin dirección' }}</td>
+
               <td>
-                Q {{
-                  servicio.total |
-                  number:'1.2-2'
-                }}
+                <span class="estado"> {{ servicio.estado }} </span>
               </td>
 
-              <td>
+              <td>Q {{ servicio.total | number:'1.2-2' }}</td>
 
+              <td>
                 <button
                   type="button"
                   class="btn-ver"
-                  (click)="verServicio(servicio)">
+                  (click)="verServicio(servicio)"
+                >
                   Ver
                 </button>
-
               </td>
-
             </tr>
-
           </tbody>
-
         </table>
-
       </div>
-
     </section>
 
     <!-- ===================================================== -->
@@ -509,76 +349,39 @@
       *ngIf="
         !cargando &&
         seccion === 'historial'
-      ">
-
+      "
+    >
       <div class="titulo-seccion">
-
         <div>
           <span class="eyebrow">AUDITORÍA</span>
           <h2>Historial de servicios</h2>
         </div>
-
       </div>
 
-      <div
-        *ngIf="historial.length === 0"
-        class="vacio">
-
+      <div *ngIf="historial.length === 0" class="vacio">
         No existe historial todavía.
-
       </div>
 
-      <div
-        *ngIf="historial.length > 0"
-        class="timeline">
-
-        <article
-          *ngFor="let item of historial"
-          class="timeline-item">
-
+      <div *ngIf="historial.length > 0" class="timeline">
+        <article *ngFor="let item of historial" class="timeline-item">
           <div class="timeline-dot"></div>
 
           <div class="timeline-content">
-
             <div class="timeline-top">
+              <strong> {{ item.codigoRastreo }} </strong>
 
-              <strong>
-                {{ item.codigoRastreo }}
-              </strong>
-
-              <span>
-                {{
-                  item.fechaHora |
-                  date:'dd/MM/yyyy HH:mm'
-                }}
-              </span>
-
+              <span> {{ item.fechaHora | date:'dd/MM/yyyy HH:mm' }} </span>
             </div>
 
-            <h4>
-              {{ item.estado }}
-            </h4>
+            <h4>{{ item.estado }}</h4>
 
-            <p>
-              {{
-                item.observacion ||
-                'Sin observaciones'
-              }}
-            </p>
+            <p>{{ item.observacion || 'Sin observaciones' }}</p>
 
-            <small>
-              Actualizado por:
-              {{ item.usuario }}
-            </small>
-
+            <small> Actualizado por: {{ item.usuario }} </small>
           </div>
-
         </article>
-
       </div>
-
     </section>
-
   </main>
 
   <!-- ===================================================== -->
@@ -590,58 +393,53 @@
       servicioSeleccionado ||
       cargandoDetalle
     "
-    class="modal-backdrop">
-
+    class="modal-backdrop"
+  >
     <div class="modal">
-
-      <div
-        *ngIf="cargandoDetalle"
-        class="cargando">
-
+      <div *ngIf="cargandoDetalle" class="cargando">
         <div class="spinner"></div>
 
-        <p>
-          Cargando servicio...
-        </p>
-
+        <p>Cargando servicio...</p>
       </div>
 
       <ng-container
         *ngIf="
           servicioSeleccionado &&
           !cargandoDetalle
-        ">
-
+        "
+      >
         <div class="ubicacion-panel" *ngIf="servicioSeleccionado.activo">
-          <a class="btn-secundario" routerLink="/rastreo" [queryParams]="{codigo: servicioSeleccionado.codigoRastreo}" target="_blank" rel="noopener">Ver mapa en otra pestaña</a>
-          <p>Comparte tu ubicación para que el cliente vea el avance en el mapa.</p>
-          <button type="button" class="btn-secundario" (click)="compartirUbicacion()" [disabled]="compartiendoServicio === servicioSeleccionado.idServicio">Compartir ubicación</button>
-          <button type="button" class="btn-secundario" *ngIf="compartiendoServicio !== null" (click)="detenerUbicacion()">Dejar de compartir</button>
+          <p>
+            Comparte tu ubicación para que el cliente vea el avance en el mapa.
+          </p>
+          <button
+            type="button"
+            class="btn-secundario"
+            (click)="compartirUbicacion()"
+            
+          >
+            {{ mensajeUbicacion ? "Reintentar ubicación" : "Compartir ubicación" }}
+          </button>
+          <button
+            type="button"
+            class="btn-secundario"
+            *ngIf="compartiendoServicio !== null"
+            (click)="detenerUbicacion()"
+          >
+            Dejar de compartir
+          </button>
           <p role="status">{{ mensajeUbicacion }}</p>
         </div>
         <div class="modal-header">
-
           <div>
+            <span class="eyebrow"> DETALLE DEL SERVICIO </span>
 
-            <span class="eyebrow">
-              DETALLE DEL SERVICIO
-            </span>
-
-            <h2>
-              {{
-                servicioSeleccionado.codigoRastreo
-              }}
-            </h2>
-
+            <h2>{{ servicioSeleccionado.codigoRastreo }}</h2>
           </div>
 
-          <button
-            type="button"
-            class="cerrar"
-            (click)="cerrarDetalle()">
+          <button type="button" class="cerrar" (click)="cerrarDetalle()">
             ×
           </button>
-
         </div>
 
         <!-- ================================================= -->
@@ -649,64 +447,33 @@
         <!-- ================================================= -->
 
         <div class="detalle-grid">
-
           <div class="dato">
-
             <span>Tipo</span>
 
             <strong>
-              {{
-                tipoServicioTexto(
-                  servicioSeleccionado.tipoServicio
-                )
-              }}
+              {{ tipoServicioTexto( servicioSeleccionado.tipoServicio ) }}
             </strong>
-
           </div>
 
           <div class="dato">
+            <span> Estado actual </span>
 
-            <span>
-              Estado actual
-            </span>
-
-            <strong>
-              {{
-                servicioSeleccionado
-                  .estado
-                  ?.nombreEstado
-              }}
-            </strong>
-
+            <strong> {{ servicioSeleccionado .estado ?.nombreEstado }} </strong>
           </div>
 
           <div class="dato">
-
             <span>Cliente</span>
 
-            <strong>
-              {{
-                servicioSeleccionado
-                  .cliente
-                  ?.nombre
-              }}
-            </strong>
-
+            <strong> {{ servicioSeleccionado .cliente ?.nombre }} </strong>
           </div>
 
           <div class="dato">
-
             <span>Total</span>
 
             <strong>
-              Q {{
-                servicioSeleccionado.total |
-                number:'1.2-2'
-              }}
+              Q {{ servicioSeleccionado.total | number:'1.2-2' }}
             </strong>
-
           </div>
-
         </div>
 
         <!-- ================================================= -->
@@ -718,54 +485,35 @@
             servicioSeleccionado.tipoServicio ===
             'DELIVERY'
           "
-          class="detalle-especifico">
-
-          <h3>
-            Información del Delivery
-          </h3>
+          class="detalle-especifico"
+        >
+          <h3>Información de la entrega</h3>
 
           <p>
             <strong>Restaurante:</strong>
 
-            {{
-              servicioSeleccionado
-                .detalle
-                ?.restaurante
-            }}
+            {{ servicioSeleccionado .detalle ?.restaurante }}
           </p>
 
           <p>
             <strong>Recoger en:</strong>
 
-            {{
-              servicioSeleccionado
-                .detalle
-                ?.direccionRestaurante
-            }}
+            {{ servicioSeleccionado .detalle ?.direccionRestaurante }}
           </p>
 
           <p>
             <strong>Entregar en:</strong>
 
-            {{
-              servicioSeleccionado
-                .detalle
-                ?.direccionEntrega ||
-              'Pasar a recoger'
-            }}
+            {{ servicioSeleccionado .detalle ?.direccionEntrega || 'Pasar a
+            recoger' }}
           </p>
 
           <p>
             <strong>Referencia:</strong>
 
-            {{
-              servicioSeleccionado
-                .detalle
-                ?.referenciaEntrega ||
-              'Sin referencia'
-            }}
+            {{ servicioSeleccionado .detalle ?.referenciaEntrega || 'Sin
+            referencia' }}
           </p>
-
         </div>
 
         <!-- ================================================= -->
@@ -777,99 +525,57 @@
             servicioSeleccionado.tipoServicio ===
             'ENVIO'
           "
-          class="detalle-especifico">
-
-          <h3>
-            Información del Envío
-          </h3>
+          class="detalle-especifico"
+        >
+          <h3>Información del Envío</h3>
 
           <p>
             <strong>Remitente:</strong>
 
-            {{
-              servicioSeleccionado
-                .detalle
-                ?.remitente
-                ?.nombre
-            }}
+            {{ servicioSeleccionado .detalle ?.remitente ?.nombre }}
           </p>
 
           <p>
             <strong>Teléfono remitente:</strong>
 
-            {{
-              servicioSeleccionado
-                .detalle
-                ?.remitente
-                ?.telefono
-            }}
+            {{ servicioSeleccionado .detalle ?.remitente ?.telefono }}
           </p>
 
           <p>
             <strong>Origen:</strong>
 
-            {{
-              servicioSeleccionado
-                .detalle
-                ?.origen
-                ?.direccion
-            }}
+            {{ servicioSeleccionado .detalle ?.origen ?.direccion }}
           </p>
 
           <p>
             <strong>Destinatario:</strong>
 
-            {{
-              servicioSeleccionado
-                .detalle
-                ?.destinatario
-                ?.nombre
-            }}
+            {{ servicioSeleccionado .detalle ?.destinatario ?.nombre }}
           </p>
 
           <p>
             <strong>Teléfono destinatario:</strong>
 
-            {{
-              servicioSeleccionado
-                .detalle
-                ?.destinatario
-                ?.telefono
-            }}
+            {{ servicioSeleccionado .detalle ?.destinatario ?.telefono }}
           </p>
 
           <p>
             <strong>Destino:</strong>
 
-            {{
-              servicioSeleccionado
-                .detalle
-                ?.destino
-                ?.direccion
-            }}
+            {{ servicioSeleccionado .detalle ?.destino ?.direccion }}
           </p>
 
           <p>
             <strong>Paquete:</strong>
 
-            {{
-              servicioSeleccionado
-                .detalle
-                ?.tipoPaquete
-            }}
+            {{ servicioSeleccionado .detalle ?.tipoPaquete }}
           </p>
 
           <p>
             <strong>Peso:</strong>
 
-            {{
-              servicioSeleccionado
-                .detalle
-                ?.peso
-            }}
-            lb
+            {{ servicioSeleccionado .detalle ?.peso }} lb
           </p>
-
         </div>
 
         <!-- ================================================= -->
@@ -880,63 +586,41 @@
           *ngIf="
             servicioSeleccionado.activo !== false
           "
-          class="actualizar">
+          class="actualizar"
+        >
+          <h3>Continuar entrega</h3>
+          <p *ngIf="error" class="alert alert-error" role="alert">{{ error }}</p>
+          <p *ngIf="requiereUbicacion() && !ubicacionLista()" role="status">
+            Para avanzar, necesitamos confirmar tu ubicación. {{ mensajeUbicacion }}
+          </p>
 
-          <h3>
-            Actualizar estado
-          </h3>
-
-          <label>
-            Nuevo estado
-          </label>
-
-          <select
-            [(ngModel)]="idEstadoSeleccionado">
-
-            <option [ngValue]="0">
-              Seleccione...
-            </option>
-
-            <option
-              *ngFor="let estado of estadosServicio"
-              [ngValue]="estado.idEstado">
-
-              {{ estado.nombreEstado }}
-
-            </option>
-
-          </select>
-
-          <label>
-            Observación
-          </label>
+          <ol class="pasos-entrega" aria-label="Progreso de la entrega">
+            <li *ngFor="let paso of pasosEntrega" [class.completado]="paso.ordenEstado <= servicioSeleccionado.estado.ordenEstado" [attr.aria-current]="paso.idEstado === servicioSeleccionado.estado.idEstado ? 'step' : null">
+              {{ paso.ordenEstado <= servicioSeleccionado.estado.ordenEstado ? '✓' : '○' }} {{ paso.nombreEstado }}
+            </li>
+          </ol>
+          <p *ngIf="siguientePaso">Siguiente paso: <strong>{{ siguientePaso.nombreEstado }}</strong>. Confirma cuando lo hayas realizado.</p>
+          <p *ngIf="mensaje" role="status">{{ mensaje }}</p>
+          <label> Nota opcional </label>
 
           <textarea
             [(ngModel)]="observacion"
             rows="3"
-            placeholder="Ejemplo: Pedido recogido correctamente">
+            placeholder="Ejemplo: Pedido recogido correctamente"
+          >
           </textarea>
 
           <button
             type="button"
             class="btn-principal"
-            [disabled]="guardando"
-            (click)="actualizarEstado()">
-
-            {{
-              guardando
-                ? 'Actualizando...'
-                : 'Actualizar estado'
-            }}
-
+            [disabled]="guardando || !siguientePaso"
+            [attr.title]="requiereUbicacion() && !ubicacionLista() ? 'Activa la ubicación y espera su confirmación para continuar' : null"
+            (click)="confirmarPaso()"
+          >
+            {{ guardando ? 'Confirmando...' : (siguientePaso ? 'Confirmar: ' + siguientePaso.nombreEstado : 'Sin pasos pendientes') }}
           </button>
-
         </div>
-
       </ng-container>
-
     </div>
-
   </div>
-
 </div>

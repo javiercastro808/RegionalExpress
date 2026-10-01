@@ -357,6 +357,8 @@
                     color del portón...
                   ">
                 </textarea>
+@defer (on viewport) { <app-mapa-ubicacion titulo="Punto de recogida obligatorio" [solicitarGps]="true" (puntoChange)="puntoOrigen=$event" /> } @placeholder { <p>Punto de recogida obligatorio: el mapa se carga al llegar a esta sección.</p> }
+
 
               </div>
 
@@ -408,6 +410,8 @@
                     o referencia...
                   ">
                 </textarea>
+@defer (on viewport) { <app-mapa-ubicacion titulo="Punto de entrega obligatorio" [solicitarGps]="false" (puntoChange)="puntoDestino=$event" /> } @placeholder { <p>Punto de entrega obligatorio: el mapa se carga al llegar a esta sección.</p> }
+
 
               </div>
 

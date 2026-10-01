@@ -1,20 +1,10 @@
 import { soloInvitados, panelAutorizado } from './services/sesion-rutas';
-import { Cliente } from './pages/cliente/cliente';
 import { Routes } from '@angular/router';
 
-import { Home } from './pages/home/home';
-import { Delivery } from './pages/delivery/delivery';
-import { Restaurante } from './pages/restaurante/restaurante';
-import { Envios } from './pages/envios/envios';
-import { Rastreo } from './pages/rastreo/rastreo';
 
-import { Login } from './pages/login/login';
-import { Admin } from './pages/admin/admin';
-import { AdminRestaurante } from './pages/admin-restaurante/admin-restaurante';
-import { Motorista } from './pages/motorista/motorista';
 
 export const routes: Routes = [
-  { path: 'panel/cliente', component: Cliente, canActivate: [panelAutorizado] },
+  { path: 'panel/cliente', loadComponent:()=>import('./pages/cliente/cliente').then(m=>m.Cliente), canActivate: [panelAutorizado] },
 
   // ==========================================================
   // PÚBLICO
@@ -22,33 +12,33 @@ export const routes: Routes = [
 
   {
     path: '',
-    component: Home
+    loadComponent:()=>import('./pages/home/home').then(m=>m.Home)
   },
 
   {
     path: 'delivery',
-    component: Delivery
+    loadComponent:()=>import('./pages/delivery/delivery').then(m=>m.Delivery)
   },
 
   {
     path: 'restaurante/:id',
-    component: Restaurante
+    loadComponent:()=>import('./pages/restaurante/restaurante').then(m=>m.Restaurante)
   },
 
   {
     path: 'envios',
-    component: Envios
+    loadComponent:()=>import('./pages/envios/envios').then(m=>m.Envios)
   },
 
   {
     path: 'rastreo',
-    component: Rastreo
+    loadComponent:()=>import('./pages/rastreo/rastreo').then(m=>m.Rastreo)
   },
 
   {
     path: 'login',
     canActivate: [soloInvitados],
-    component: Login
+    loadComponent:()=>import('./pages/login/login').then(m=>m.Login)
   },
 
   // ==========================================================
@@ -58,19 +48,19 @@ export const routes: Routes = [
   {
     path: 'panel/admin',
     canActivate: [panelAutorizado],
-    component: Admin
+    loadComponent:()=>import('./pages/admin/admin').then(m=>m.Admin)
   },
 
   {
     path: 'panel/restaurante',
     canActivate: [panelAutorizado],
-    component: AdminRestaurante
+    loadComponent:()=>import('./pages/admin-restaurante/admin-restaurante').then(m=>m.AdminRestaurante)
   },
 
   {
     path: 'panel/motorista',
     canActivate: [panelAutorizado],
-    component: Motorista
+    loadComponent:()=>import('./pages/motorista/motorista').then(m=>m.Motorista)
   },
 
   // ==========================================================

@@ -1,3 +1,6 @@
+import { inject, DestroyRef, ChangeDetectorRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { finalize } from 'rxjs';
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -18,6 +21,7 @@ import { Auth, UsuarioSesion } from '../../services/auth';
   styleUrl: './admin-restaurante.scss'
 })
 export class AdminRestaurante implements OnInit {
+ private cdr=inject(ChangeDetectorRef);private destroyRef=inject(DestroyRef);
 
   usuario: UsuarioSesion | null = null;
 
@@ -144,9 +148,10 @@ export class AdminRestaurante implements OnInit {
 
       categorias:
         this.api
-          .getRestauranteAdminCategorias()
-
+          .getRestauranteAdminCategorias(),
+      historial:this.api.getRestauranteAdminHistorial()
     })
+    .pipe(takeUntilDestroyed(this.destroyRef),finalize(()=>this.cdr.markForCheck()))
     .subscribe({
 
       next: respuesta => {
@@ -163,8 +168,7 @@ export class AdminRestaurante implements OnInit {
         this.categorias =
           respuesta.categorias ?? [];
 
-        // Historial separado eliminado por ahora.
-        this.historial = [];
+        this.historial = respuesta.historial ?? [];
 
         this.cargando = false;
       },
@@ -230,7 +234,8 @@ export class AdminRestaurante implements OnInit {
 
     this.api
       .getRestauranteAdminPedidos()
-      .subscribe({
+      .pipe(takeUntilDestroyed(this.destroyRef),finalize(()=>this.cdr.markForCheck()))
+    .subscribe({
 
         next: (datos: any[]) => {
 
@@ -269,7 +274,8 @@ export class AdminRestaurante implements OnInit {
       .getRestauranteAdminPedido(
         idPedido
       )
-      .subscribe({
+      .pipe(takeUntilDestroyed(this.destroyRef),finalize(()=>this.cdr.markForCheck()))
+    .subscribe({
 
         next: datos => {
 
@@ -324,7 +330,8 @@ export class AdminRestaurante implements OnInit {
         idEstado,
         'Estado actualizado desde panel del restaurante'
       )
-      .subscribe({
+      .pipe(takeUntilDestroyed(this.destroyRef),finalize(()=>this.cdr.markForCheck()))
+    .subscribe({
 
         next: respuesta => {
 
@@ -541,7 +548,8 @@ export class AdminRestaurante implements OnInit {
           this.idProductoEditando,
           datos
         )
-        .subscribe({
+        .pipe(takeUntilDestroyed(this.destroyRef),finalize(()=>this.cdr.markForCheck()))
+    .subscribe({
 
           next: respuesta => {
 
@@ -579,7 +587,8 @@ export class AdminRestaurante implements OnInit {
       .crearRestauranteAdminProducto(
         datos
       )
-      .subscribe({
+      .pipe(takeUntilDestroyed(this.destroyRef),finalize(()=>this.cdr.markForCheck()))
+    .subscribe({
 
         next: respuesta => {
 
@@ -630,7 +639,8 @@ export class AdminRestaurante implements OnInit {
         ),
         disponible
       )
-      .subscribe({
+      .pipe(takeUntilDestroyed(this.destroyRef),finalize(()=>this.cdr.markForCheck()))
+    .subscribe({
 
         next: respuesta => {
 
@@ -671,7 +681,8 @@ export class AdminRestaurante implements OnInit {
         ),
         activo
       )
-      .subscribe({
+      .pipe(takeUntilDestroyed(this.destroyRef),finalize(()=>this.cdr.markForCheck()))
+    .subscribe({
 
         next: respuesta => {
 
@@ -699,7 +710,8 @@ export class AdminRestaurante implements OnInit {
 
     this.api
       .getRestauranteAdminProductos()
-      .subscribe({
+      .pipe(takeUntilDestroyed(this.destroyRef),finalize(()=>this.cdr.markForCheck()))
+    .subscribe({
 
         next: (datos: any[]) => {
 
@@ -826,7 +838,8 @@ export class AdminRestaurante implements OnInit {
           this.idCategoriaEditando,
           datos
         )
-        .subscribe({
+        .pipe(takeUntilDestroyed(this.destroyRef),finalize(()=>this.cdr.markForCheck()))
+    .subscribe({
 
           next: respuesta => {
 
@@ -864,7 +877,8 @@ export class AdminRestaurante implements OnInit {
       .crearRestauranteAdminCategoria(
         datos
       )
-      .subscribe({
+      .pipe(takeUntilDestroyed(this.destroyRef),finalize(()=>this.cdr.markForCheck()))
+    .subscribe({
 
         next: respuesta => {
 
@@ -915,7 +929,8 @@ export class AdminRestaurante implements OnInit {
         ),
         activo
       )
-      .subscribe({
+      .pipe(takeUntilDestroyed(this.destroyRef),finalize(()=>this.cdr.markForCheck()))
+    .subscribe({
 
         next: respuesta => {
 
@@ -943,7 +958,8 @@ export class AdminRestaurante implements OnInit {
 
     this.api
       .getRestauranteAdminCategorias()
-      .subscribe({
+      .pipe(takeUntilDestroyed(this.destroyRef),finalize(()=>this.cdr.markForCheck()))
+    .subscribe({
 
         next: (datos: any[]) => {
 
@@ -985,7 +1001,8 @@ export class AdminRestaurante implements OnInit {
 
     this.api
       .getRestauranteAdminDashboard()
-      .subscribe({
+      .pipe(takeUntilDestroyed(this.destroyRef),finalize(()=>this.cdr.markForCheck()))
+    .subscribe({
 
         next: datos => {
 

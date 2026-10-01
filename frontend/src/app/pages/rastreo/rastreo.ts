@@ -1,4 +1,4 @@
-import { Subscription, timer, forkJoin, of, catchError, exhaustMap } from 'rxjs';
+import { Subscription, timer, forkJoin, of, catchError, exhaustMap, filter } from 'rxjs';
 import { MapaRastreo } from './mapa-rastreo';
 import {
   ChangeDetectorRef, Component, OnDestroy, OnInit
@@ -83,7 +83,7 @@ export class Rastreo implements OnInit, OnDestroy {
     const codigo = this.codigo.trim().toUpperCase();
     if (!codigo) { this.error = 'Ingresa un código de rastreo.'; return; }
     this.buscando = true;
-    this.consulta = timer(0, 15000).pipe(exhaustMap(() => forkJoin({
+    this.consulta = timer(0, 15000).pipe(filter(()=>!document.hidden),exhaustMap(() => forkJoin({
       servicio: this.api.rastrear(codigo),
       ubicacion: this.api.getUbicacionRastreo(codigo).pipe(catchError(() => of(null)))
     }).pipe(catchError(() => of(null))))).subscribe(datos => {

@@ -71,6 +71,10 @@ namespace RegionalExpress.API.Controllers
 
             // PAQUETE
 
+            public decimal? LatitudOrigen { get; set; }
+            public decimal? LongitudOrigen { get; set; }
+            public decimal? LatitudDestino { get; set; }
+            public decimal? LongitudDestino { get; set; }
             public decimal Peso { get; set; }
 
             public decimal DistanciaKm { get; set; }
@@ -176,6 +180,8 @@ namespace RegionalExpress.API.Controllers
             if (!int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out var clienteId)) return Unauthorized();
             if (!await _context.Usuarios.AnyAsync(u => u.IdUsuario == clienteId && u.Activo && u.IdRolNavigation.Activo)) return Forbid();
             request.IdCliente = clienteId;
+            if (!RegionalExpress.API.Services.ReglasUbicacion.Valida(request.LatitudOrigen,request.LongitudOrigen) || !RegionalExpress.API.Services.ReglasUbicacion.Valida(request.LatitudDestino,request.LongitudDestino))
+                return BadRequest(new { mensaje = "Selecciona ubicaciones válidas de recogida y entrega." });
             // ==========================================
             // VALIDACIONES
             // ==========================================
@@ -534,12 +540,10 @@ namespace RegionalExpress.API.Controllers
                                     .Trim(),
 
 
-                        LatitudOrigen =
-                            null,
+                        LatitudOrigen = request.LatitudOrigen,
 
 
-                        LongitudOrigen =
-                            null,
+                        LongitudOrigen = request.LongitudOrigen,
 
 
                         DireccionDestino =
@@ -556,12 +560,10 @@ namespace RegionalExpress.API.Controllers
                                     .Trim(),
 
 
-                        LatitudDestino =
-                            null,
+                        LatitudDestino = request.LatitudDestino,
 
 
-                        LongitudDestino =
-                            null,
+                        LongitudDestino = request.LongitudDestino,
 
 
                         Peso =

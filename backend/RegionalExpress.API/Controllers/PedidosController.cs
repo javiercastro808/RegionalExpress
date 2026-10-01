@@ -41,6 +41,8 @@ namespace RegionalExpress.API.Controllers
 
             public string? ReferenciaEntrega { get; set; }
 
+            public decimal? LatitudEntrega { get; set; }
+            public decimal? LongitudEntrega { get; set; }
             public decimal CostoProductos { get; set; }
 
             public decimal CostoDelivery { get; set; }
@@ -116,7 +118,7 @@ namespace RegionalExpress.API.Controllers
             }
 
 
-            
+
 
 
             // ==========================================
@@ -153,6 +155,10 @@ namespace RegionalExpress.API.Controllers
                 return BadRequest(new { mensaje = "Seleccione DOMICILIO o RECOGER." });
             if (request.ModalidadEntrega == "DOMICILIO" && string.IsNullOrWhiteSpace(request.DireccionEntrega))
                 return BadRequest(new { mensaje = "Ingrese la dirección de entrega." });
+            if (request.ModalidadEntrega == "DOMICILIO" && (!request.LatitudEntrega.HasValue || !request.LongitudEntrega.HasValue))
+                return BadRequest(new { mensaje = "La ubicación es obligatoria para entrega a domicilio." });
+            if (request.LatitudEntrega.HasValue != request.LongitudEntrega.HasValue || request.LatitudEntrega is < -90 or > 90 || request.LongitudEntrega is < -180 or > 180)
+                return BadRequest(new { mensaje = "Coordenadas inválidas." });
             if (request.Productos.Count > 100 || request.Productos.Any(p => p.Cantidad < 1 || p.Cantidad > 100)
                 || request.Productos.Select(p => p.IdProducto).Distinct().Count() != request.Productos.Count)
                 return BadRequest(new { mensaje = "Revise los productos y sus cantidades (1 a 100)." });
@@ -277,11 +283,9 @@ namespace RegionalExpress.API.Controllers
                                 ? request.ReferenciaEntrega
                                 : null,
 
-                        LatitudEntrega =
-                            null,
+                        LatitudEntrega = request.ModalidadEntrega == "DOMICILIO" ? request.LatitudEntrega : null,
 
-                        LongitudEntrega =
-                            null,
+                        LongitudEntrega = request.ModalidadEntrega == "DOMICILIO" ? request.LongitudEntrega : null,
 
                         CostoProductos =
                             request.CostoProductos,

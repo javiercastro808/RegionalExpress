@@ -61,6 +61,19 @@ namespace RegionalExpress.API.Controllers
         }
 
         // =========================================================
+        [HttpGet("historial")]
+        public async Task<IActionResult> Historial()
+        {
+            var asignacion = await ObtenerAsignacionRestaurante();
+            if(asignacion == null) return NotFound(new { mensaje = "No tienes un restaurante asignado." });
+            var historial = await _context.HistorialEstados.AsNoTracking()
+                .Where(h => h.IdServicioNavigation.Pedido != null && h.IdServicioNavigation.Pedido.IdRestaurante == asignacion.IdRestaurante)
+                .OrderByDescending(h => h.FechaHora)
+                .Select(h => new { h.IdHistorial, h.IdServicio, codigoRastreo=h.IdServicioNavigation.CodigoRastreo,
+                    estado=h.IdEstadoNavigation.NombreEstado, usuario=h.IdUsuarioNavigation.Nombre, h.FechaHora, h.Observacion }).ToListAsync();
+            return Ok(historial);
+        }
+
         // DASHBOARD
         // GET api/AdminRestaurante/dashboard
         // =========================================================

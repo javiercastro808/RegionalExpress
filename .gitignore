@@ -42,3 +42,6 @@ respaldos-codex/
 *.pubxml.user
 artifacts/
 backend/**/wwwroot/
+
+# Pruebas locales generadas
+.verification/

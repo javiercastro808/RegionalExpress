@@ -338,12 +338,14 @@
 
             <input
               type="password"
-              [(ngModel)]="usuarioForm.password">
+              [(ngModel)]="usuarioForm.password" minlength="8" autocomplete="new-password" aria-describedby="ayuda-clave">
+            <small id="ayuda-clave">Mínimo 8 caracteres. Recomendamos combinar letras, números y símbolos. Al editar, déjala vacía para conservar la actual.</small>
 
           </div>
 
         </div>
 
+        <p *ngIf="error" class="error-formulario" role="alert">{{ error }}</p>
         <div class="form-actions">
 
           <button
@@ -870,6 +872,7 @@
 
         </div>
 
+        <p *ngIf="error" class="error-formulario" role="alert">{{ error }}</p>
         <div class="form-actions">
 
           <button
@@ -908,7 +911,7 @@
             <thead>
 
               <tr>
-                <th>Restaurante</th>
+                <th>Restaurante y descripción</th>
                 <th>Dirección</th>
                 <th>Contacto</th>
                 <th>Horario</th>
@@ -1188,6 +1191,7 @@
 
         </div>
 
+        <p *ngIf="error" class="error-formulario" role="alert">{{ error }}</p>
         <div class="form-actions">
 
           <button

@@ -3,7 +3,7 @@ $raiz = Split-Path $PSScriptRoot -Parent
 Push-Location $raiz
 try {
     $remoto = (& git remote get-url origin).Trim()
-    if ($remoto -ne 'https://github.com/javiercastro808/proyecto-grupal-regional-express.git') { throw 'El repositorio remoto no coincide con Regional Express.' }
+    if ($remoto -ne 'https://github.com/javiercastro808/RegionalExpress.git') { throw 'El repositorio remoto no coincide con Regional Express.' }
     $nombre = & git config user.name
     if (!$nombre) {
         $nombre = Read-Host 'Nombre que aparecerá como autor de los cambios'
@@ -16,7 +16,10 @@ try {
         if ($correo -notmatch '^[^\s@]+@[^\s@]+\.[^\s@]+$') { throw 'Correo de autor no válido.' }
         & git config --local user.email $correo
     }
-    & git add -- .
+    & git add -u
+    if ($LASTEXITCODE -ne 0) { throw 'No se pudieron preparar los cambios existentes.' }
+    $rutasProyecto = @('frontend', 'backend', 'database', 'docs', 'scripts', 'README.md', '.gitignore') | Where-Object { Test-Path -LiteralPath $_ }
+    & git add -- $rutasProyecto
     if ($LASTEXITCODE -ne 0) { throw 'No se pudieron preparar los archivos.' }
     $archivos = & git diff --cached --name-only
     $privados = $archivos | Where-Object { ($_ -match '(^|/)appsettings.*\.json$' -and $_ -notmatch '/appsettings\.Example\.json$') -or $_ -match '(^|/)(App_Data|node_modules|artifacts)/|\.(bak|mdf|ldf|pfx|key|publishsettings)$|(^|/)\.env($|\.)' }
@@ -27,5 +30,5 @@ try {
     }
     & git push -u origin main
     if ($LASTEXITCODE -ne 0) { throw 'GitHub no recibió los cambios. Completa el inicio de sesión que solicite Git y vuelve a ejecutar este archivo.' }
-    Write-Host 'Subida completada: https://github.com/javiercastro808/proyecto-grupal-regional-express'
+    Write-Host 'Subida completada: https://github.com/javiercastro808/RegionalExpress'
 } finally { Pop-Location }

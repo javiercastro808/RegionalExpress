@@ -455,6 +455,7 @@ namespace RegionalExpress.API.Controllers
                 });
             }
 
+            await using var transaction = await _context.Database.BeginTransactionAsync(System.Data.IsolationLevel.Serializable);
             var servicio = await _context.Servicios
                 .Include(x => x.Pedido)
                 .Include(x => x.IdEstadoActualNavigation)
@@ -469,6 +470,15 @@ namespace RegionalExpress.API.Controllers
                     mensaje = "Servicio no encontrado o no asignado a este motorista."
                 });
             }
+
+            if (!servicio.Activo || servicio.FechaFinalizacion != null) return Conflict(new { mensaje = "El servicio ya finalizó." });
+            var modalidadPaso = servicio.Pedido?.ModalidadEntrega;
+            var siguiente = await _context.EstadosServicios.Where(e => e.Activo && e.TipoServicio == servicio.TipoServicio
+                && (servicio.TipoServicio == "DELIVERY" ? e.Modalidad == modalidadPaso : (e.Modalidad == null || e.Modalidad == ""))
+                && e.OrdenEstado > servicio.IdEstadoActualNavigation.OrdenEstado && !e.NombreEstado.Contains("Cancel"))
+                .OrderBy(e => e.OrdenEstado).ThenBy(e=>e.IdEstado).FirstOrDefaultAsync();
+            if (siguiente == null || siguiente.IdEstado != request.IdEstado)
+                return Conflict(new { mensaje = "Confirma únicamente el siguiente paso. Actualiza el servicio si otro usuario lo modificó." });
 
             var consultaEstado =
                 _context.EstadosServicios
@@ -507,6 +517,16 @@ namespace RegionalExpress.API.Controllers
                 });
             }
 
+            if (servicio.Pedido?.ModalidadEntrega != "RECOGER" &&
+                !nuevoEstado.NombreEstado.Contains("CANCEL", StringComparison.OrdinalIgnoreCase))
+            {
+                var limite = DateTime.UtcNow.AddMinutes(-2);
+                var ubicacionReciente = await _context.UbicacionesMotorista.AnyAsync(u =>
+                    u.IdServicio == id && u.IdMotorista == motorista.IdMotorista && u.FechaHora >= limite);
+                if (!ubicacionReciente)
+                    return Conflict(new { mensaje = "Activa la ubicación y espera su confirmación antes de avanzar la entrega." });
+            }
+
             var estadoActual =
                 servicio.IdEstadoActualNavigation;
 
@@ -530,8 +550,7 @@ namespace RegionalExpress.API.Controllers
                 });
             }
 
-            await using var transaction =
-                await _context.Database.BeginTransactionAsync();
+
 
             try
             {
@@ -543,7 +562,7 @@ namespace RegionalExpress.API.Controllers
                         .Where(x =>
                             x.TipoServicio ==
                                 servicio.TipoServicio &&
-                            x.Activo);
+                            x.Activo && !x.NombreEstado.Contains("Cancel"));
 
                 if (
                     servicio.TipoServicio == "DELIVERY" &&
