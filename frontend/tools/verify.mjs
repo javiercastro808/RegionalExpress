@@ -313,6 +313,30 @@ test('tarjetas del motorista abren filtros y muestran un solo título',()=>{
  count++;console.log('OK ubicación de 245 metros se confirma como aproximada; más de 500 no avanza');
  }finally{m.ngOnDestroy();if(oldNav)Object.defineProperty(globalThis,'navigator',oldNav);else delete globalThis.navigator;if(oldWin)Object.defineProperty(globalThis,'window',oldWin);else delete globalThis.window;}
 }
+
+const {capaMapa}=await load('services/capa-mapa');
+test('cartografía conserva atribución y referencia del sitio e informa fallos',()=>{
+ let opciones,mensaje='';const eventos={};const capa={on:(e,cb)=>{eventos[e]=cb;return capa;}};
+ capaMapa({tileLayer:(url,opts)=>{opciones=opts;assert.equal(url,'https://tile.openstreetmap.org/{z}/{x}/{y}.png');return capa;}},v=>mensaje=v);
+ assert.equal(opciones.referrerPolicy,'strict-origin-when-cross-origin');assert.match(opciones.attribution,/OpenStreetMap/);
+ eventos.loading();eventos.tileerror();eventos.load();assert.match(mensaje,/cartografía/);
+ eventos.loading();eventos.load();assert.equal(mensaje,'');
+});
+const {JSDOM}=await import('jsdom');
+const {VentanaMapa}=await load('components/ventana-mapa/ventana-mapa');
+test('ventana ampliada conserva el mismo mapa y restaura posición y tamaño',()=>{
+ const dom=new JSDOM('<div id="base"><div id="mapa" style="height:300px"></div><p id="despues"></p></div><dialog><div id="destino"></div></dialog>');
+ const old=Object.getOwnPropertyDescriptor(globalThis,'window');
+ Object.defineProperty(globalThis,'window',{configurable:true,value:{dispatchEvent:()=>{}}});
+ try {
+ const doc=dom.window.document,v=new VentanaMapa(),mapa=doc.getElementById('mapa'),dialog=doc.querySelector('dialog');
+ dialog.showModal=()=>dialog.setAttribute('open','');dialog.close=()=>dialog.removeAttribute('open');
+ v.elemento=mapa;v.ventana={nativeElement:dialog};v.destino={nativeElement:doc.getElementById('destino')};
+ v.abrir();assert.equal(v.abierta(),true);assert.equal(mapa.parentNode.id,'destino');assert.equal(mapa.style.height,'100%');
+ v.cerrar();assert.equal(mapa.parentNode.id,'base');assert.equal(mapa.nextSibling.id,'despues');assert.equal(mapa.style.height,'300px');
+ v.abrir();v.restaurar();assert.equal(v.abierta(),false);assert.equal(mapa.parentNode.id,'base');v.ngOnDestroy();
+ }finally{dom.window.close();if(old)Object.defineProperty(globalThis,'window',old);else delete globalThis.window;}
+});
 console.log(
   count +
     " pruebas de lógica aprobadas. No reemplazan las pruebas visuales ni la integración con SQL.",

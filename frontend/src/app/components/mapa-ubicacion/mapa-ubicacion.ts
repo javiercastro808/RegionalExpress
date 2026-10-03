@@ -1,3 +1,5 @@
+import { VentanaMapa } from '../ventana-mapa/ventana-mapa';
+import { capaMapa } from '../../services/capa-mapa';
 import {
   Input,
   AfterViewInit,
@@ -29,6 +31,7 @@ export function coordenadasValidas(lat: number, lng: number): boolean {
 @Component({
   selector: "app-mapa-ubicacion",
   standalone: true,
+  imports: [VentanaMapa],
   template: `<section aria-label="Ubicación de entrega">
     <p>
       <strong>{{titulo}}.</strong> Usa tu ubicación o
@@ -42,8 +45,9 @@ export function coordenadasValidas(lat: number, lng: number): boolean {
     >
       {{ buscando() ? "Buscando ubicación…" : "Usar mi ubicación" }}
     </button>
-    <button type="button" class="btn btn-outline-primary mb-2" (click)="ampliado.set(!ampliado())" [attr.aria-expanded]="ampliado()">{{ampliado() ? "Reducir mapa" : "Ampliar mapa"}}</button>
-    <div #canvas [class.ampliado]="ampliado()" class="mapa" aria-label="Selecciona el punto de entrega"></div>
+    <app-ventana-mapa [elemento]="canvas" />
+    <div #canvas class="mapa" aria-label="Selecciona el punto de entrega"></div>
+    <p role="alert" class="small mt-2">{{errorMapa()}}</p>
     <p role="status" class="small mt-2">{{ mensaje() }}</p>
   </section>`,
   styles: [
@@ -62,7 +66,7 @@ export function coordenadasValidas(lat: number, lng: number): boolean {
   ],
 })
 export class MapaUbicacion implements AfterViewInit, OnDestroy {
-  ampliado = signal(false);
+  errorMapa = signal('');
   @Input() titulo='Ubicación obligatoria para la entrega';
   @Input() solicitarGps=true;
   @Output() puntoChange = new EventEmitter<PuntoEntrega>();
@@ -86,11 +90,7 @@ export class MapaUbicacion implements AfterViewInit, OnDestroy {
         [14.609, -90.535],
         11,
       );
-      L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution:
-          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      }).addTo(this.mapa);
+      capaMapa(L, mensaje => {if(!this.destruido)this.errorMapa.set(mensaje);}).addTo(this.mapa);
       this.mapa.on("click", (event: Leaflet.LeafletMouseEvent) =>
         this.elegir(event.latlng.lat, event.latlng.lng),
       );
